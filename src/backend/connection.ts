@@ -1,7 +1,7 @@
 import WebSocket from 'ws';
 import { Commands } from 'redis';
 
-import { assignCards } from './game';
+import { assignCards, getInitialRevealedInformation } from './game';
 
 interface EndMessage {
     type: 'end';
@@ -201,6 +201,14 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                                     sock.send(JSON.stringify({
                                         type: 'stage',
                                         stage: 'action',
+                                    }));
+
+                                    sock.send(JSON.stringify({
+                                        type: 'initialRevealedInformation',
+                                        info: getInitialRevealedInformation(
+                                            playerId,
+                                            await redisCall<{ [id: string]: string }>('hgetall', `games:${gameId}:assignedCards`),
+                                        ),
                                     }));
                                 }
                             }
