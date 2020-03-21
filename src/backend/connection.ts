@@ -153,7 +153,6 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                 ) {
                     await redisCall<number>('lpush', `games:${gameId}:cardsInPlay`, ...message.cardsInPlay);
                     await redisCall<number>('set', `games:${gameId}:stage`, 'viewCard');
-                    await redisCall<number>('set', `games:${gameId}:numConfirmed`, '0');
 
                     broadcast(gameId, {
                         type: 'cardsInPlay',
@@ -179,9 +178,9 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                         }
                     );
                 } else if (message.type == 'confirmOwnCard' && await redisCall<number>('sismember', `games:${gameId}:playersInGame`, playerId)) {
-                    const numConfirmed = await redisCall<number>('incr', `games:${gameId}:numConfirmed`);
+                    await redisCall<number>('sadd', `games:${gameId}:haveConfirmed`, playerId);
 
-                    if (numConfirmed >= await redisCall<number>('scard', `games:${gameId}:playersInGame`)) {
+                    if (await redisCall<number>('scard', `games:${gameId}:haveConfirmed`) >= await redisCall<number>('scard', `games:${gameId}:playersInGame`)) {
                         // time for actions
                     }
                 } else {

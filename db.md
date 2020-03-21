@@ -17,5 +17,5 @@ What does the database currently look like?
     - list of all cards in the game (incl. center)
 - `games:{gameId}:assignedCards`
     - hash mapping player ID to card
-- `games:{gameId}:numConfirmed`
-    - number of players that have confirmed viewing their card
+- `games:{gameId}:haveConfirmed`
+    - set of player IDs that have confirmed viewing their card
