@@ -1,0 +1,17 @@
+export const cards = [
+    'werewolf',
+    'werewolf',
+    'minion',
+    'mason',
+    'mason',
+    'seer',
+    'robber',
+    'troublemaker',
+    'drunk',
+    'insomniac',
+    'tanner',
+    'hunter',
+    'villager',
+    'villager',
+    'villager',
+];

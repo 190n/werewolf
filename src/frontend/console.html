@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>WebSocket console</title>
+        <style>
+            input[type=text] {
+                width: 500px;
+            }
+
+            #output {
+                border: thin solid gray;
+                height: 200px;
+                overflow-y: scroll;
+                background-color: lightyellow;
+            }
+        </style>
+    </head>
+    <body>
+        <form id="urlform" action="#">
+            Connect to URL: <input type="text" autofocus value="ws://localhost:5000/connect?joinCode=" id="url">
+            <input type="submit" value="Connect">
+        </form>
+        <p>
+            <button id="newgame">Create and connect to new game</button>
+        </p>
+        <pre id="output"></pre>
+        <form id="sendform" action="#">
+            Send data: <input type="text" id="data">
+            <input type="submit" value="Send">
+        </form>
+        <script>
+            const output = document.getElementById('output');
+
+            function scrollOutput() {
+                output.scrollTop = output.scrollTopMax;
+            }
+
+            function startConnection() {
+                if (typeof ws == 'object') ws.close();
+                ws = new WebSocket(document.getElementById('url').value);
+                ws.onmessage = (e) => {
+                    output.innerHTML += `\n<em>Server: </em>${e.data}`;
+                    scrollOutput();
+                };
+                ws.onclose = () => {
+                    output.innerHTML += '\n<em>Connection closed</em>';
+                    scrollOutput();
+                };
+                ws.onopen = () => {
+                    output.innerHTML += '\n<em>Connection opened</em>';
+                    scrollOutput();
+                };
+                return false;
+            }
+
+            document.getElementById('urlform').onsubmit = startConnection;
+
+            document.getElementById('sendform').onsubmit = () => {
+                const data = document.getElementById('data').value;
+                output.innerHTML += `\n<em>Client: </em>${data}`;
+                scrollOutput();
+                ws.send(data);
+                return false;
+            };
+
+            document.getElementById('newgame').onclick = async () => {
+                const data = await (await fetch('http://localhost:5000/games/create')).json();
+                console.log(data);
+                document.getElementById('url').value = `ws://localhost:5000/connect?joinCode=${data.joinCode}&key=${data.key}`;
+                startConnection();
+            }
+        </script>
+    </body>
+</html>
