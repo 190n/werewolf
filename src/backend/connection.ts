@@ -179,9 +179,32 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                     );
                 } else if (message.type == 'confirmOwnCard' && await redisCall<number>('sismember', `games:${gameId}:playersInGame`, playerId)) {
                     await redisCall<number>('sadd', `games:${gameId}:haveConfirmed`, playerId);
+                    // TODO: probably need to tell player whether they have confirmed, so reloading
+                    // will preserve their confirmation
 
                     if (await redisCall<number>('scard', `games:${gameId}:haveConfirmed`) >= await redisCall<number>('scard', `games:${gameId}:playersInGame`)) {
                         // time for actions
+
+                        await redisCall<number>('set', `games:${gameId}:stage`, 'turns');
+                        const sockets = openSockets.get(gameId) as Map<string, WebSocket>;
+
+                        for (const playerId of await redisCall<string[]>('smembers', `games:${gameId}:playersInGame`)) {
+                            if (sockets.has(playerId)) {
+                                const sock = sockets.get(playerId) as WebSocket;
+
+                                if (await redisCall<string>('hget', `games:${gameId}:assignedCards`, playerId) == 'insomniac') {
+                                    sock.send(JSON.stringify({
+                                        type: 'stage',
+                                        stage: 'wait',
+                                    }));
+                                } else {
+                                    sock.send(JSON.stringify({
+                                        type: 'stage',
+                                        stage: 'action',
+                                    }));
+                                }
+                            }
+                        }
                     }
                 } else {
                     killConnection(ws, 'Malformed message.');
@@ -213,10 +236,26 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
 
             if (stage != 'lobby') {
                 if (await redisCall<number>('sismember', `games:${gameId}:playersInGame`, playerId)) {
-                    ws.send(JSON.stringify({
-                        type: 'stage',
-                        stage,
-                    }));
+                    if (stage != 'turns') {
+                        ws.send(JSON.stringify({
+                            type: 'stage',
+                            stage,
+                        }));
+                    } else {
+                        // (insomniac AND waiting for card-moving actions) OR (has done their action)
+                        if (await redisCall<string>('hget', `games:${gameId}:assignedCards`, playerId) == 'insomniac') {
+                            ws.send(JSON.stringify({
+                                type: 'stage',
+                                stage: 'wait',
+                            }));
+                        } else {
+                            ws.send(JSON.stringify({
+                                type: 'stage',
+                                stage: 'action',
+                            }));
+                        }
+                    }
+
                     ws.send(JSON.stringify({
                         type: 'playersInGame',
                         players: await redisCall<string[]>('smembers', `games:${gameId}:playersInGame`),

@@ -7,6 +7,8 @@ import Connect from './Connect';
 import Lobby from './Lobby';
 import CardSelection from './CardSelection';
 import ViewCard from './ViewCard';
+import Wait from './Wait';
+import Turn from './Turn';
 
 const InGameDispatch = observer(({ store }: StoreProps): JSX.Element => {
     function onMessage({ data }: MessageEvent) {
@@ -41,6 +43,8 @@ const InGameDispatch = observer(({ store }: StoreProps): JSX.Element => {
         lobby: <Lobby store={store} />,
         cardSelection: <CardSelection store={store} />,
         viewCard: <ViewCard store={store} />,
+        wait: <Wait />,
+        action: <Turn store={store} />,
         disconnected: <p>Disconnected: {store.disconnectReason}</p>,
     }[store.stage];
 });

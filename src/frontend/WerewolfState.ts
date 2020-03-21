@@ -1,6 +1,6 @@
 import { observable, computed } from 'mobx';
 
-export type Stage = 'joining' | 'lobby' | 'cardSelection' | 'viewCard' | 'disconnected';
+export type Stage = 'joining' | 'lobby' | 'cardSelection' | 'viewCard' | 'wait' | 'action' | 'disconnected';
 
 export interface Player {
     id: string;

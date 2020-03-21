@@ -3,13 +3,16 @@ import { observer } from 'mobx-react';
 
 import { StoreProps } from './WerewolfState';
 import useSharedSocket from './use-shared-socket';
-import { cards } from '../lib/cards';
 
 const ViewCard = observer(({ store }: StoreProps): JSX.Element => {
     const [hasConfirmed, setHasConfirmed] = useState(false);
+    const [sendMessage] = useSharedSocket();
 
     function confirm() {
         setHasConfirmed(true);
+        sendMessage(JSON.stringify({
+            type: 'confirmOwnCard',
+        }));
     }
 
     return (
@@ -25,7 +28,7 @@ const ViewCard = observer(({ store }: StoreProps): JSX.Element => {
                     {hasConfirmed ? (
                         'Waiting for other players to confirm...'
                     ) : (
-                        <button>OK</button>
+                        <button onClick={confirm}>OK</button>
                     )}
                 </>
             )}
