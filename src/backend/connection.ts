@@ -261,6 +261,14 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                                 type: 'stage',
                                 stage: 'action',
                             }));
+
+                            ws.send(JSON.stringify({
+                                type: 'initialRevealedInformation',
+                                info: getInitialRevealedInformation(
+                                    playerId,
+                                    await redisCall<{ [id: string]: string }>('hgetall', `games:${gameId}:assignedCards`),
+                                ),
+                            }));
                         }
                     }
 
