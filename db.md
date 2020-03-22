@@ -19,3 +19,5 @@ What does the database currently look like?
     - hash mapping player ID to card
 - `games:{gameId}:haveConfirmed`
     - set of player IDs that have confirmed viewing their card
+- `games:{gameId}:actions`
+    - hash mapping player IDs to their action (which might be an empty string)

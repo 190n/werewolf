@@ -27,6 +27,6 @@ export default Turn;
 
 export type TurnComponent = (props: {
     players: Player[],
-    revealed: string,
+    revealed?: string,
     onAction: (action: string) => void,
 }) => JSX.Element;

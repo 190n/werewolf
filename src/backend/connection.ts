@@ -250,8 +250,12 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                             stage,
                         }));
                     } else {
+                        //            |<--      not implemented       -->|
                         // (insomniac AND waiting for card-moving actions) OR (has done their action)
-                        if (await redisCall<string>('hget', `games:${gameId}:assignedCards`, playerId) == 'insomniac') {
+                        if (
+                            await redisCall<string>('hget', `games:${gameId}:assignedCards`, playerId) == 'insomniac'
+                            || await redisCall<number>('hexists', `games:${gameId}:actions`, playerId)
+                        ) {
                             ws.send(JSON.stringify({
                                 type: 'stage',
                                 stage: 'wait',
