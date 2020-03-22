@@ -27,11 +27,53 @@ export function getInitialRevealedInformation(
     playerId: string,
     assignedCards: { [id: string]: string },
 ): string {
-    const thisCard = assignedCards[playerId];
+    const theirCard = assignedCards[playerId];
 
-    if (thisCard == 'werewolf' || thisCard == 'mason') {
-        return Object.keys(assignedCards).filter(id => id != playerId && assignedCards[id] == thisCard).join(',');
+    if (theirCard == 'werewolf' || theirCard == 'mason') {
+        return Object.keys(assignedCards).filter(id => id != playerId && assignedCards[id] == theirCard).join(',');
+    } else if (theirCard == 'minion') {
+        return Object.keys(assignedCards).filter(id => assignedCards[id] == 'werewolf').join(',');
     } else {
         return '';
+    }
+}
+
+export function isActionLegal(
+    playerId: string,
+    assignedCards: { [id: string]: string },
+    action: string,
+): boolean {
+    const theirCard = assignedCards[playerId];
+
+    if (theirCard == 'werewolf') {
+        if (Object.keys(assignedCards).filter(id => assignedCards[id] == 'werewolf').length == 1) {
+            // they are the only werewolf, so they can choose a card in the middle
+            return action == 'left' || action == 'middle' || action == 'right';
+        } else {
+            // other werewolves are present, so no action can be taken
+            return action == '';
+        }
+    } else if (theirCard == 'seer') {
+        if (action.includes(',')) {
+            // trying to look at two cards? must both be in center
+            const cards = action.split(',');
+            return cards.length == 2 && cards[0] != cards[1] && cards.every(c => (c == 'left' || c == 'middle' || c == 'right'));
+        } else {
+            // trying to look at one card? must be the id of a different player
+            return action != playerId && assignedCards.hasOwnProperty(action);
+        }
+    } else if (theirCard == 'robber') {
+        // must be the id of a different player
+        return action != playerId && assignedCards.hasOwnProperty(action);
+    } else if (theirCard == 'troublemaker') {
+        // must both be ids of different, distinct players
+        const players = action.split(',');
+        return players.length == 2 && players[0] != players[1] && players.every(p => (p != playerId && assignedCards.hasOwnProperty(p)));
+    } else if (theirCard == 'drunk') {
+        // must be a card in the center
+        return action == 'left' || action == 'middle' || action == 'right';
+    } else {
+        // cannot take an action
+        return action == '';
     }
 }
