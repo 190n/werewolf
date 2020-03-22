@@ -175,7 +175,10 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                                     card,
                                 }));
                             }
-                        }
+                        },
+                        async (cards: string[]) => {
+                            await redisCall<number>('lpush', `games:${gameId}:center`, ...cards);
+                        },
                     );
                 } else if (message.type == 'confirmOwnCard' && await redisCall<number>('sismember', `games:${gameId}:playersInGame`, playerId)) {
                     await redisCall<number>('sadd', `games:${gameId}:haveConfirmed`, playerId);

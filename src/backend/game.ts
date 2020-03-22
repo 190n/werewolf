@@ -2,6 +2,7 @@ export async function assignCards(
     playerIds: string[],
     cards: string[],
     assign: (playerId: string, card: string) => Promise<void>,
+    assignCenter: (cards: string[]) => Promise<void>,
 ): Promise<void> {
     if (cards.length != playerIds.length + 3) {
         throw new Error('Wrong number of cards');
@@ -18,6 +19,8 @@ export async function assignCards(
     for (let i = 0; i < playerIds.length; i++) {
         await assign(playerIds[i], shuffled[i]);
     }
+
+    await assignCenter([shuffled[shuffled.length - 3], shuffled[shuffled.length - 2], shuffled[shuffled.length - 1]]);
 }
 
 export function getInitialRevealedInformation(
