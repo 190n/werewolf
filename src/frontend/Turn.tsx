@@ -3,6 +3,7 @@ import { observer } from 'mobx-react';
 
 import { StoreProps, Player } from './WerewolfState';
 import Werewolf from './turns/Werewolf';
+import Seer from './turns/Seer';
 
 const Turn = observer(({ store }: StoreProps): JSX.Element => {
     if (store.ownCard == 'werewolf') {
@@ -11,6 +12,14 @@ const Turn = observer(({ store }: StoreProps): JSX.Element => {
                 players={store.playersInGame}
                 revealed={store.initialRevealedInformation}
                 onAction={(action) => console.log(`werewolf action: ${action}`)}
+            />
+        );
+    } else if (store.ownCard == 'seer') {
+        return (
+            <Seer
+                players={store.playersInGame}
+                revealed={store.initialRevealedInformation}
+                onAction={(action) => console.log(`seer action: ${action}`)}
             />
         );
     } else {

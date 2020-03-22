@@ -23,7 +23,7 @@ export async function assignCards(
     await assignCenter([shuffled[shuffled.length - 3], shuffled[shuffled.length - 2], shuffled[shuffled.length - 1]]);
 }
 
-export function getInitialRevealedInformation(
+export function getInitialRevelation(
     playerId: string,
     assignedCards: { [id: string]: string },
 ): string {

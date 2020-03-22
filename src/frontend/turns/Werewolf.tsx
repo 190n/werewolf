@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Player } from '../WerewolfState';
 import { TurnComponent } from '../Turn';
 
-const Werewolf: TurnComponent = ({ players, revealed, onAction }): JSX.Element => {
+const Werewolf: TurnComponent = ({ players, revealed, onAction }) => {
     if (revealed === undefined) {
         return (
             <p>
