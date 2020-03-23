@@ -98,6 +98,9 @@ export function performAction(
             // two in center
             const cards = action.split(',');
             return `${center[parseInt(cards[0])]},${center[parseInt(cards[1])]}`;
+        } else {
+            // one other player's card
+            return assignedCards[action];
         }
     } else if (theirCard == 'robber') {
         // TODO: also return, in some way, a list of swaps resulting from the action
