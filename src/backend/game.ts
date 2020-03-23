@@ -48,7 +48,7 @@ export function isActionLegal(
     if (theirCard == 'werewolf') {
         if (Object.keys(assignedCards).filter(id => assignedCards[id] == 'werewolf').length == 1) {
             // they are the only werewolf, so they can choose a card in the middle
-            return action == 'left' || action == 'middle' || action == 'right';
+            return action.length == 1 && '012'.includes(action);
         } else {
             // other werewolves are present, so no action can be taken
             return action == '';
@@ -57,7 +57,7 @@ export function isActionLegal(
         if (action.includes(',')) {
             // trying to look at two cards? must both be in center
             const cards = action.split(',');
-            return cards.length == 2 && cards[0] != cards[1] && cards.every(c => (c == 'left' || c == 'middle' || c == 'right'));
+            return cards.length == 2 && cards[0] != cards[1] && cards.every(c => (c.length == 1 && '012'.includes(c)));
         } else {
             // trying to look at one card? must be the id of a different player
             return action != playerId && assignedCards.hasOwnProperty(action);
@@ -71,9 +71,47 @@ export function isActionLegal(
         return players.length == 2 && players[0] != players[1] && players.every(p => (p != playerId && assignedCards.hasOwnProperty(p)));
     } else if (theirCard == 'drunk') {
         // must be a card in the center
-        return action == 'left' || action == 'middle' || action == 'right';
+        return action.length == 1 && '012'.includes(action);
     } else {
         // cannot take an action
         return action == '';
     }
+}
+
+export function performAction(
+    playerId: string,
+    assignedCards: { [id: string]: string },
+    center: string[],
+    action: string,
+): string | boolean {
+    if (!isActionLegal(playerId, assignedCards, action)) {
+        return false;
+    }
+
+    const theirCard = assignedCards[playerId];
+
+    if (theirCard == 'werewolf' && action != '') {
+        // looking in center
+        return center[parseInt(action)];
+    } else if (theirCard == 'seer') {
+        if (action.includes(',')) {
+            // two in center
+            const cards = action.split(',');
+            return `${center[parseInt(cards[0])]},${center[parseInt(cards[1])]}`;
+        }
+    } else if (theirCard == 'robber') {
+        // TODO: also return, in some way, a list of swaps resulting from the action
+        // a swap is [string | number, string | number]
+        // string = player ID, number = index into center
+        // reveal the card they took
+        return assignedCards[action];
+    } else if (theirCard == 'troublemaker') {
+        // TODO: note which cards were switched
+    } else if (theirCard == 'drunk') {
+        // TODO: support configuring whether modified drunk is used
+        // reveal the card they took
+        return center[parseInt(action)];
+    }
+
+    return true;
 }

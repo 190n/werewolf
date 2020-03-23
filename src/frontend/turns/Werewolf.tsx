@@ -3,15 +3,15 @@ import React, { useState } from 'react';
 import { Player } from '../WerewolfState';
 import { TurnComponent } from '../Turn';
 
-const Werewolf: TurnComponent = ({ players, revealed, onAction }) => {
-    if (revealed === undefined) {
+const Werewolf: TurnComponent = ({ players, revelations, onAction }) => {
+    if (revelations.length == 0) {
         return (
             <p>
                 Waiting for server...
             </p>
         );
-    } else {
-        const otherWerewolves = revealed.split(',').map(id => players.find(p => p.id == id)).filter(p => p !== undefined) as Player[];
+    } else if (revelations.length == 1) {
+        const otherWerewolves = revelations[0].split(',').map(id => players.find(p => p.id == id)).filter(p => p !== undefined) as Player[];
 
         if (otherWerewolves.length > 0) {
             if (otherWerewolves.length == 1) {
@@ -62,6 +62,9 @@ const Werewolf: TurnComponent = ({ players, revealed, onAction }) => {
                 </>
             );
         }
+    } else {
+        // we learned which card is in the center
+        return <p>not implemented</p>;
     }
 };
 

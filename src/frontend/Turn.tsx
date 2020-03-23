@@ -10,7 +10,7 @@ const Turn = observer(({ store }: StoreProps): JSX.Element => {
         return (
             <Werewolf
                 players={store.playersInGame}
-                revealed={store.initialRevealedInformation}
+                revelations={store.revelations}
                 onAction={(action) => console.log(`werewolf action: ${action}`)}
             />
         );
@@ -18,7 +18,7 @@ const Turn = observer(({ store }: StoreProps): JSX.Element => {
         return (
             <Seer
                 players={store.playersInGame}
-                revealed={store.initialRevealedInformation}
+                revelations={store.revelations}
                 onAction={(action) => console.log(`seer action: ${action}`)}
             />
         );
@@ -26,7 +26,7 @@ const Turn = observer(({ store }: StoreProps): JSX.Element => {
         return (
             <div className="Turn">
                 Turn for {store.ownCard}<br />
-                Info: {store.initialRevealedInformation}
+                Info: {store.revelations.join('; ')}
             </div>
         );
     }
@@ -36,6 +36,6 @@ export default Turn;
 
 export type TurnComponent = (props: {
     players: Player[],
-    revealed?: string,
+    revelations: string[],
     onAction: (action: string) => void,
 }) => JSX.Element;

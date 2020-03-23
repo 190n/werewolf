@@ -17,7 +17,7 @@ export default class WerewolfState {
     @observable public playerIdsInGame: string[] = [];
     @observable public cardsInPlay: string[] = [];
     @observable public ownCard: string | undefined = undefined;
-    @observable public initialRevealedInformation: string | undefined = undefined;
+    @observable public revelations: string[] = [];
 
     @computed public get me(): Player | undefined {
         return this.players.find(p => p.id == this.ownId);

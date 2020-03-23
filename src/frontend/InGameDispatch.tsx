@@ -27,8 +27,8 @@ const InGameDispatch = observer(({ store }: StoreProps): JSX.Element => {
                 store.cardsInPlay = message.cardsInPlay;
             } else if (message.type == 'yourCard') {
                 store.ownCard = message.card;
-            } else if (message.type == 'initialRevealedInformation') {
-                store.initialRevealedInformation = message.info;
+            } else if (message.type == 'revelation') {
+                store.revelations.push(message.info);
             }
         } catch (e) {}
     }
