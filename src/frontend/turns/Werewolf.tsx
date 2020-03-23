@@ -34,7 +34,7 @@ const Werewolf: TurnComponent = ({ players, revelations, onAction }) => {
                 );
             }
         } else {
-            const [selectedCard, setSelectedCard] = useState('');
+            const [selectedCard, setSelectedCard] = useState(-1);
 
             return (
                 <>
@@ -42,21 +42,21 @@ const Werewolf: TurnComponent = ({ players, revelations, onAction }) => {
                         You are the only <span className="tag werewolf">Werewolf</span>. Choose a card from the center to look at:
                     </p>
                     <p>
-                        {['left', 'middle', 'right'].map(c => (
+                        {['left', 'middle', 'right'].map((c, i) => (
                             <label htmlFor={c} key={c}>
                                 <input
                                     type="radio"
                                     name="cardFromCenter"
-                                    value={c}
+                                    value={i}
                                     id={c}
-                                    checked={selectedCard == c}
-                                    onChange={() => setSelectedCard(c)}
+                                    checked={selectedCard == i}
+                                    onChange={() => setSelectedCard(i)}
                                 />
                                 {c}
                             </label>
                         ))}
                     </p>
-                    <button disabled={selectedCard == ''} onClick={() => (selectedCard != '' && onAction(selectedCard))}>
+                    <button disabled={selectedCard == -1} onClick={() => (selectedCard != -1 && onAction(selectedCard.toString()))}>
                         OK
                     </button>
                 </>

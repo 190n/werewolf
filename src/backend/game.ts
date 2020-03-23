@@ -78,43 +78,57 @@ export function isActionLegal(
     }
 }
 
+// string means player ID
+// number means index into the center
+// last item is precedence; lower numbers are evaluated first
+// robber precedence = 0
+// troublemaker precedence = 1
+// drunk precedence = 2
+export type Swap = [string | number, string | number, number];
+
+// returned a string: action was ok; send that information to the player
+// returned a bool: action was ok or not (depending on what the bool was); no new information for player
+export type ActionResult = [
+    string | boolean,
+    Swap[],
+];
+
 export function performAction(
     playerId: string,
     assignedCards: { [id: string]: string },
     center: string[],
     action: string,
-): string | boolean {
+): ActionResult {
     if (!isActionLegal(playerId, assignedCards, action)) {
-        return false;
+        return [false, []];
     }
 
     const theirCard = assignedCards[playerId];
 
     if (theirCard == 'werewolf' && action != '') {
         // looking in center
-        return center[parseInt(action)];
+        return [center[parseInt(action)], []];
     } else if (theirCard == 'seer') {
         if (action.includes(',')) {
             // two in center
-            const cards = action.split(',');
-            return `${center[parseInt(cards[0])]},${center[parseInt(cards[1])]}`;
+            const [card1, card2] = action.split(',');
+            return [`${center[parseInt(card1)]},${center[parseInt(card2)]}`, []];
         } else {
             // one other player's card
-            return assignedCards[action];
+            return [assignedCards[action], []];
         }
     } else if (theirCard == 'robber') {
-        // TODO: also return, in some way, a list of swaps resulting from the action
-        // a swap is [string | number, string | number]
-        // string = player ID, number = index into center
         // reveal the card they took
-        return assignedCards[action];
+        return [assignedCards[action], [[playerId, action, 0]]];
     } else if (theirCard == 'troublemaker') {
-        // TODO: note which cards were switched
+        // swap 'em
+        const [card1, card2] = action.split(',');
+        return [true, [[card1, card2, 1]]];
     } else if (theirCard == 'drunk') {
         // TODO: support configuring whether modified drunk is used
         // reveal the card they took
-        return center[parseInt(action)];
+        return [center[parseInt(action)], [[playerId, parseInt(action), 2]]];
     }
 
-    return true;
+    return [true, []];
 }
