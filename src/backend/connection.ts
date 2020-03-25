@@ -106,6 +106,32 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
         return await redisCall<string | undefined>('hget', 'gameKeys', gameId) == playerId;
     }
 
+    async function getAssignedCards(gameId: string): Promise<{ [id: string]: string }> {
+        return await redisCall<{ [id: string]: string }>('hgetall', `games:${gameId}:assignedCards`);
+    }
+
+    async function getEvents(gameId: string, filterPlayerId?: string, filterType?: 'r' | 'a'): Promise<string[]> {
+        const events = await redisCall<string[]>(
+            'lrange',
+            `games:${gameId}:events`,
+            0,
+            await redisCall<number>('llen', `games:${gameId}:events`) - 1
+        );
+
+        if (filterPlayerId !== undefined) {
+            const split = events.map(e => e.split(':')),
+                byPlayer = events.filter((e, i) => split[i][1] == filterPlayerId);
+
+            if (filterType !== undefined) {
+                return byPlayer.filter((e, i) => split[i][0] == filterType);
+            } else {
+                return byPlayer;
+            }
+        } else {
+            return events;
+        }
+    }
+
     async function handleIncomingMessage(gameId: string, playerId: string, ws: WebSocket, data: string) {
         try {
             const message = JSON.parse(data);
@@ -206,13 +232,16 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                                         stage: 'action',
                                     }));
 
-                                    sock.send(JSON.stringify({
-                                        type: 'revelation',
-                                        info: getInitialRevelation(
-                                            playerId,
-                                            await redisCall<{ [id: string]: string }>('hgetall', `games:${gameId}:assignedCards`),
-                                        ),
-                                    }));
+                                    const revelation = getInitialRevelation(playerId, await getAssignedCards(gameId));
+
+                                    if (revelation !== undefined) {
+                                        await redisCall<number>('rpush', `games:${gameId}:events`, `r:${playerId}:${revelation}`);
+
+                                        sock.send(JSON.stringify({
+                                            type: 'revelation',
+                                            revelation,
+                                        }));
+                                    }
                                 }
                             }
                         }
@@ -269,12 +298,13 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                                 stage: 'action',
                             }));
 
+                            const events = await getEvents(gameId, playerId);
                             ws.send(JSON.stringify({
-                                type: 'initialRevealedInformation',
-                                info: getInitialRevealedInformation(
-                                    playerId,
-                                    await redisCall<{ [id: string]: string }>('hgetall', `games:${gameId}:assignedCards`),
-                                ),
+                                type: 'events',
+                                events: events.map(e => ([
+                                    e.split(':')[0],
+                                    e.split(':')[2],
+                                ])),
                             }));
                         }
                     }
@@ -291,7 +321,8 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                                 'lrange',
                                 `games:${gameId}:cardsInPlay`,
                                 0,
-                                await redisCall<number>('llen', `games:${gameId}:cardsInPlay`)),
+                                await redisCall<number>('llen', `games:${gameId}:cardsInPlay`) - 1
+                            ),
                         }));
 
                         ws.send(JSON.stringify({

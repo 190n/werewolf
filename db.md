@@ -21,5 +21,9 @@ What does the database currently look like?
     - list of cards in the center
 - `games:{gameId}:haveConfirmed`
     - set of player IDs that have confirmed viewing their card
-- `games:{gameId}:actions`
-    - hash mapping player IDs to their action (which might be an empty string)
+- `games:{gameId}:events`
+    - list of events in the game, in order of occurence. event format:  
+        `{type}:{playerID}:{data}`
+    - type is `r` (revelation) or `a` (action). data may be an empty string.
+- `games:{gameId}:completedTurns`
+    - set of player IDs that have completed their turn

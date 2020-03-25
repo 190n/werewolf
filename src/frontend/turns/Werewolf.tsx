@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
+import { observer } from 'mobx-react';
 
 import { Player } from '../WerewolfState';
 import { TurnComponent } from '../Turn';
 
-const Werewolf: TurnComponent = ({ players, revelations, onAction }) => {
+const Werewolf: TurnComponent = observer(({ players, revelations, onAction }) => {
     if (revelations.length == 0) {
         return (
             <p>
@@ -66,6 +67,6 @@ const Werewolf: TurnComponent = ({ players, revelations, onAction }) => {
         // we learned which card is in the center
         return <p>not implemented</p>;
     }
-};
+});
 
 export default Werewolf;

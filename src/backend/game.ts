@@ -26,7 +26,7 @@ export async function assignCards(
 export function getInitialRevelation(
     playerId: string,
     assignedCards: { [id: string]: string },
-): string {
+): string | undefined {
     const theirCard = assignedCards[playerId];
 
     if (theirCard == 'werewolf' || theirCard == 'mason') {
@@ -34,7 +34,7 @@ export function getInitialRevelation(
     } else if (theirCard == 'minion') {
         return Object.keys(assignedCards).filter(id => assignedCards[id] == 'werewolf').join(',');
     } else {
-        return '';
+        return undefined;
     }
 }
 
@@ -88,6 +88,7 @@ export type Swap = [string | number, string | number, number];
 
 // returned a string: action was ok; send that information to the player
 // returned a bool: action was ok or not (depending on what the bool was); no new information for player
+// if it returns true, that also means that player's turn is over
 export type ActionResult = [
     string | boolean,
     Swap[],
@@ -108,7 +109,7 @@ export function performAction(
     if (theirCard == 'werewolf' && action != '') {
         // looking in center
         return [center[parseInt(action)], []];
-    } else if (theirCard == 'seer') {
+    } else if (theirCard == 'seer' && action != '') {
         if (action.includes(',')) {
             // two in center
             const [card1, card2] = action.split(',');
@@ -117,14 +118,14 @@ export function performAction(
             // one other player's card
             return [assignedCards[action], []];
         }
-    } else if (theirCard == 'robber') {
+    } else if (theirCard == 'robber' && action != '') {
         // reveal the card they took
         return [assignedCards[action], [[playerId, action, 0]]];
     } else if (theirCard == 'troublemaker') {
         // swap 'em
         const [card1, card2] = action.split(',');
         return [true, [[card1, card2, 1]]];
-    } else if (theirCard == 'drunk') {
+    } else if (theirCard == 'drunk' && action != '') {
         // TODO: support configuring whether modified drunk is used
         // reveal the card they took
         return [center[parseInt(action)], [[playerId, parseInt(action), 2]]];

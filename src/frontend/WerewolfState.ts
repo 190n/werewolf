@@ -17,7 +17,7 @@ export default class WerewolfState {
     @observable public playerIdsInGame: string[] = [];
     @observable public cardsInPlay: string[] = [];
     @observable public ownCard: string | undefined = undefined;
-    @observable public revelations: string[] = [];
+    @observable public events: ['r' | 'a', string][] = [];
 
     @computed public get me(): Player | undefined {
         return this.players.find(p => p.id == this.ownId);
@@ -37,6 +37,14 @@ export default class WerewolfState {
 
     @computed public get playersInGame(): Player[] {
         return this.playerIdsInGame.map(id => this.players.find(p => p.id == id) as Player);
+    }
+
+    @computed public get revelations(): string[] {
+        return this.events.filter(e => e[0] == 'r').map(e => e[1]);
+    }
+
+    @computed public get ownActions(): string[] {
+        return this.events.filter(e => e[0] == 'a').map(e => e[1]);
     }
 }
 
