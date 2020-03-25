@@ -1,6 +1,9 @@
 import React from 'react';
+import { observer } from 'mobx-react';
 
-const Wait = (): JSX.Element => (
+import { StoreProps } from './WerewolfState';
+
+const Wait = ({ store }: StoreProps): JSX.Element => (
     <div className="Wait">
         <h1>Waiting for other players...</h1>
     </div>

@@ -1,7 +1,7 @@
 import WebSocket from 'ws';
 import { Commands } from 'redis';
 
-import { assignCards, getInitialRevelation } from './game';
+import { assignCards, getInitialRevelation, performAction } from './game';
 
 interface EndMessage {
     type: 'end';
@@ -108,6 +108,10 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
 
     async function getAssignedCards(gameId: string): Promise<{ [id: string]: string }> {
         return await redisCall<{ [id: string]: string }>('hgetall', `games:${gameId}:assignedCards`);
+    }
+
+    async function getCenter(gameId: string): Promise<[string, string, string]> {
+        return await redisCall<[string, string, string]>('lrange', `games:${gameId}:center`, 0, 2);
     }
 
     async function getEvents(gameId: string, filterPlayerId?: string, filterType?: 'r' | 'a'): Promise<string[]> {
@@ -246,6 +250,61 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                             }
                         }
                     }
+                } else if (
+                    message.type == 'action'
+                    && await redisCall<number>('sismember', `games:${gameId}:playersInGame`, playerId)
+                    && !(await redisCall<number>('sismember', `games:${gameId}:completedTurns`, playerId))
+                ) {
+                    const action: string = message.action;
+                    const [result, swaps] = performAction(
+                        playerId,
+                        await getAssignedCards(gameId),
+                        await getCenter(gameId),
+                        action,
+                    );
+
+                    if (result !== false) {
+                        if (swaps.length > 0) {
+                            // store any resulting swaps
+                            // we use lpush because it's faster than rpush, and order doesn't matter
+                            // (each swap stores when it should be executed)
+                            await redisCall<number>(
+                                'lpush',
+                                `games:${gameId}:swaps`,
+                                ...swaps.map(([card1, card2, order]) => `${card1}:${card2}:${order}`),
+                            );
+                        }
+
+                        if (typeof result == 'string') {
+                            // legal action; new revelation returned
+                            // push action and revelation to redis
+                            await redisCall<number>(
+                                'rpush',
+                                `games:${gameId}:events`,
+                                `a:${playerId}:${action}`,
+                                `r:${playerId}:${result}`,
+                            );
+                            ws.send(JSON.stringify({
+                                type: 'revelation',
+                                revelation: result,
+                            }));
+                        } else if (result === true) {
+                            // legal action; turn is over
+                            await redisCall<number>(
+                                'rpush',
+                                `games:${gameId}:events`,
+                                `a:${playerId}:${action}`,
+                            );
+                            await redisCall<number>('sadd', `games:${gameId}:completedTurns`, playerId);
+                            ws.send(JSON.stringify({
+                                type: 'stage',
+                                stage: 'wait',
+                            }));
+                        }
+                    } else {
+                        // illegal action
+                        killConnection(ws, 'Illegal action.');
+                    }
                 } else {
                     killConnection(ws, 'Malformed message.');
                 }
@@ -282,11 +341,20 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                             stage,
                         }));
                     } else {
+                        const events = await getEvents(gameId, playerId);
+                        ws.send(JSON.stringify({
+                            type: 'events',
+                            events: events.map(e => ([
+                                e.split(':')[0],
+                                e.split(':')[2],
+                            ])),
+                        }));
+
                         //            |<--      not implemented       -->|
-                        // (insomniac AND waiting for card-moving actions) OR (has done their action)
+                        // (insomniac AND waiting for card-moving actions) OR (has finished their turn)
                         if (
                             await redisCall<string>('hget', `games:${gameId}:assignedCards`, playerId) == 'insomniac'
-                            || await redisCall<number>('hexists', `games:${gameId}:actions`, playerId)
+                            || await redisCall<number>('sismember', `games:${gameId}:completedTurns`, playerId)
                         ) {
                             ws.send(JSON.stringify({
                                 type: 'stage',
@@ -296,15 +364,6 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                             ws.send(JSON.stringify({
                                 type: 'stage',
                                 stage: 'action',
-                            }));
-
-                            const events = await getEvents(gameId, playerId);
-                            ws.send(JSON.stringify({
-                                type: 'events',
-                                events: events.map(e => ([
-                                    e.split(':')[0],
-                                    e.split(':')[2],
-                                ])),
                             }));
                         }
                     }

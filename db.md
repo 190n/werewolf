@@ -27,3 +27,7 @@ What does the database currently look like?
     - type is `r` (revelation) or `a` (action). data may be an empty string.
 - `games:{gameId}:completedTurns`
     - set of player IDs that have completed their turn
+- `games:{gameId}:swaps`
+    - list of swaps that will occur in the game. format:  
+        `{card1}:{card2}:{order}`  
+        card1 and card2 are either a single digit (0, 1, 2; index into center) or a player ID. precedence is a number. swaps are evaluated in ascending order based on `order`.

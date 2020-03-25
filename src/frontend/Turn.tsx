@@ -1,33 +1,47 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { observer } from 'mobx-react';
 
 import { StoreProps, Player } from './WerewolfState';
 import Werewolf from './turns/Werewolf';
 import Seer from './turns/Seer';
+import useSharedSocket from './use-shared-socket';
 
 const Turn = observer(({ store }: StoreProps): JSX.Element => {
+    const [sendMessage] = useSharedSocket();
+    const [action, setAction] = useState('');
+
+    function onAction(action: string) {
+        sendMessage(JSON.stringify({
+            type: 'action',
+            action,
+        }));
+        store.events.push(['a', action]);
+    }
+
     if (store.ownCard == 'werewolf') {
         return (
             <Werewolf
                 players={store.playersInGame}
                 revelations={store.revelations}
-                onAction={(action) => console.log(`werewolf action: ${action}`)}
-            />
-        );
-    } else if (store.ownCard == 'seer') {
-        return (
-            <Seer
-                players={store.playersInGame}
-                revelations={store.revelations}
-                onAction={(action) => console.log(`seer action: ${action}`)}
+                onAction={onAction}
             />
         );
     } else {
         return (
-            <div className="Turn">
-                Turn for {store.ownCard}<br />
-                Info: {store.revelations.join('; ')}
-            </div>
+            <>
+                <p>
+                    You are the&nbsp;
+                    <span className={`tag ${store.ownCard}`}>{store.ownCard}</span>
+                </p>
+                <p>
+                    <input
+                        type="text"
+                        value={action}
+                        onChange={e => setAction(e.target.value)}
+                    />
+                    <button onClick={() => onAction(action)}>Submit action</button>
+                </p>
+            </>
         );
     }
 });

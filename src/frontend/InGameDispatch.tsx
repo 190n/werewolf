@@ -42,15 +42,29 @@ const InGameDispatch = observer(({ store }: StoreProps): JSX.Element => {
 
     useSharedSocket({ onMessage, onClose });
 
-    return {
+    const mainComponent = {
         joining: <Connect store={store} />,
         lobby: <Lobby store={store} />,
         cardSelection: <CardSelection store={store} />,
         viewCard: <ViewCard store={store} />,
-        wait: <Wait />,
+        wait: <Wait store={store} />,
         action: <Turn store={store} />,
         disconnected: <p>Disconnected: {store.disconnectReason}</p>,
     }[store.stage];
+
+    return (
+        <>
+            {mainComponent}
+            <ul>
+                {store.events.map(([type, value], i) => (
+                    <li key={i}>
+                        {type == 'r' ? 'Revelation' : 'Action'}:&nbsp;
+                        {value}
+                    </li>
+                ))}
+            </ul>
+        </>
+    );
 });
 
 export default InGameDispatch;

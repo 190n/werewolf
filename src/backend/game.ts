@@ -47,8 +47,8 @@ export function isActionLegal(
 
     if (theirCard == 'werewolf') {
         if (Object.keys(assignedCards).filter(id => assignedCards[id] == 'werewolf').length == 1) {
-            // they are the only werewolf, so they can choose a card in the middle
-            return action.length == 1 && '012'.includes(action);
+            // they are the only werewolf, so they can choose a card in the middle, or confirm what they saw
+            return action.length == 1 && '012'.includes(action) || action == '';
         } else {
             // other werewolves are present, so no action can be taken
             return action == '';
@@ -58,20 +58,23 @@ export function isActionLegal(
             // trying to look at two cards? must both be in center
             const cards = action.split(',');
             return cards.length == 2 && cards[0] != cards[1] && cards.every(c => (c.length == 1 && '012'.includes(c)));
-        } else {
+        } else if (action.length > 0) {
             // trying to look at one card? must be the id of a different player
             return action != playerId && assignedCards.hasOwnProperty(action);
+        } else {
+            // confirming what they have seen
+            return true;
         }
     } else if (theirCard == 'robber') {
-        // must be the id of a different player
-        return action != playerId && assignedCards.hasOwnProperty(action);
+        // must be the id of a different player, or confirming what they took
+        return action != playerId && assignedCards.hasOwnProperty(action) || action == '';
     } else if (theirCard == 'troublemaker') {
         // must both be ids of different, distinct players
         const players = action.split(',');
         return players.length == 2 && players[0] != players[1] && players.every(p => (p != playerId && assignedCards.hasOwnProperty(p)));
     } else if (theirCard == 'drunk') {
-        // must be a card in the center
-        return action.length == 1 && '012'.includes(action);
+        // must be a card in the center, or confirming what they took
+        return action.length == 1 && '012'.includes(action) || action == '';
     } else {
         // cannot take an action
         return action == '';
