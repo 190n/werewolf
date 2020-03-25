@@ -25,17 +25,48 @@ export async function assignCards(
 
 // string means player ID
 // number means index into the center
-// last item is precedence; lower numbers are evaluated first
-// robber precedence = 0
-// troublemaker precedence = 1
-// drunk precedence = 2
+// last item is order; lower numbers are evaluated first
+// robber = 0
+// troublemaker = 1
+// drunk = 2
 export type Swap = [string | number, string | number, number];
 
+export type CardAssignments = { [id: string]: string };
+export type Center = [string, string, string];
+
+export function executeSwaps(
+    assignedCards: CardAssignments,
+    center: Center,
+    swaps: Swap[]
+): [CardAssignments, Center] {
+    const movedCards = { ...assignedCards },
+        newCenter = [...center] as Center;
+
+    const sortedSwaps = [...swaps].sort((s1, s2) => s1[2] - s2[2]);
+    for (const [card1, card2] of sortedSwaps) {
+        const orig1 = (typeof card1 == 'string' ? movedCards[card1] : newCenter[card1]),
+            orig2 = (typeof card2 == 'string' ? movedCards[card2] : newCenter[card2]);
+
+        if (typeof card1 == 'string') {
+            movedCards[card1] = orig2;
+        } else {
+            newCenter[card1] = orig2;
+        }
+
+        if (typeof card2 == 'string') {
+            movedCards[card2] = orig1;
+        } else {
+            newCenter[card2] = orig1;
+        }
+    }
+
+    return [movedCards, newCenter];
+}
+
 // doppelganger will require a list of the center as well, to handle doppelganger drunk
-// needs to also accept previous actions, so e.g. seer can't double dip
 export function getInitialRevelation(
     playerId: string,
-    assignedCards: { [id: string]: string },
+    assignedCards: CardAssignments,
     swaps: Swap[],
 ): string | undefined {
     const theirCard = assignedCards[playerId];
@@ -50,12 +81,9 @@ export function getInitialRevelation(
             return theirCard;
         } else {
             // will go into another method
-            const movedCards = { ...assignedCards };
-            for (const [card1, card2] of [...swaps].sort((s1, s2) => s1[2] - s2[2])) {
-                const temp = movedCards[card1];
-                movedCards[card1] = movedCards[card2];
-                movedCards[card2] = temp;
-            }
+            const [movedCards] = executeSwaps(assignedCards, ['error', 'error', 'error'], swaps.filter(([c1, c2]) => (
+                typeof c1 == 'string' && typeof c2 == 'string'
+            )));
             return movedCards[playerId];
         }
     } else {
@@ -63,15 +91,17 @@ export function getInitialRevelation(
     }
 }
 
+// needs to also accept previous actions, so e.g. seer can't double dip
 export function isActionLegal(
     playerId: string,
-    assignedCards: { [id: string]: string },
+    assignedCards: CardAssignments,
     action: string,
+    previousActions: string[],
 ): boolean {
     const theirCard = assignedCards[playerId];
 
     if (theirCard == 'werewolf') {
-        if (Object.keys(assignedCards).filter(id => assignedCards[id] == 'werewolf').length == 1) {
+        if (previousActions.length == 0 && Object.keys(assignedCards).filter(id => assignedCards[id] == 'werewolf').length == 1) {
             // they are the only werewolf, so they can choose a card in the middle, or confirm what they saw
             return action.length == 1 && '012'.includes(action) || action == '';
         } else {
@@ -79,27 +109,42 @@ export function isActionLegal(
             return action == '';
         }
     } else if (theirCard == 'seer') {
-        if (action.includes(',')) {
-            // trying to look at two cards? must both be in center
-            const cards = action.split(',');
-            return cards.length == 2 && cards[0] != cards[1] && cards.every(c => (c.length == 1 && '012'.includes(c)));
-        } else if (action.length > 0) {
-            // trying to look at one card? must be the id of a different player
-            return action != playerId && assignedCards.hasOwnProperty(action);
+        if (previousActions.length == 0) {
+            if (action.includes(',')) {
+                // trying to look at two cards? must both be in center
+                const cards = action.split(',');
+                return cards.length == 2 && cards[0] != cards[1] && cards.every(c => (c.length == 1 && '012'.includes(c)));
+            } else {
+                // trying to look at one card? must be the id of a different player
+                return action != playerId && assignedCards.hasOwnProperty(action);
+            }
         } else {
             // confirming what they have seen
-            return true;
+            return action == '';
         }
     } else if (theirCard == 'robber') {
         // must be the id of a different player, or confirming what they took
-        return action != playerId && assignedCards.hasOwnProperty(action) || action == '';
+        if (previousActions.length == 0) {
+            return action != playerId && assignedCards.hasOwnProperty(action);
+        } else {
+            return action == '';
+        }
     } else if (theirCard == 'troublemaker') {
         // must both be ids of different, distinct players
-        const players = action.split(',');
-        return players.length == 2 && players[0] != players[1] && players.every(p => (p != playerId && assignedCards.hasOwnProperty(p)));
+        if (previousActions.length == 0) {
+            const players = action.split(',');
+            return players.length == 2 && players[0] != players[1] && players.every(p => (p != playerId && assignedCards.hasOwnProperty(p)));
+        } else {
+            // troublemaker doesn't need to confirm, as they don't learn anything new after performing their action
+            return false;
+        }
     } else if (theirCard == 'drunk') {
         // must be a card in the center, or confirming what they took
-        return action.length == 1 && '012'.includes(action) || action == '';
+        if (previousActions.length == 0) {
+            return action.length == 1 && '012'.includes(action);
+        } else {
+            return action == '';
+        }
     } else {
         // cannot take an action
         return action == '';
@@ -116,11 +161,12 @@ export type ActionResult = [
 
 export function performAction(
     playerId: string,
-    assignedCards: { [id: string]: string },
-    center: string[],
+    assignedCards: CardAssignments,
+    center: Center,
     action: string,
+    previousActions: string[]
 ): ActionResult {
-    if (!isActionLegal(playerId, assignedCards, action)) {
+    if (!isActionLegal(playerId, assignedCards, action, previousActions)) {
         return [false, []];
     }
 
@@ -160,7 +206,7 @@ export const dependencies: { [card: string]: string[] | undefined } = {
 
 export function canTakeAction(
     playerId: string,
-    assignedCards: { [id: string]: string },
+    assignedCards: CardAssignments,
     completedTurns: string[],
 ): boolean {
     const theirCard = assignedCards[playerId],

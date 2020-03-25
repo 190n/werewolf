@@ -123,13 +123,12 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
         );
 
         if (filterPlayerId !== undefined) {
-            const split = events.map(e => e.split(':')),
-                byPlayer = events.filter((e, i) => split[i][1] == filterPlayerId);
+            const split = events.map(e => e.split(':'));
 
-            if (filterType !== undefined) {
-                return byPlayer.filter((e, i) => split[i][0] == filterType);
+            if (filterType === undefined) {
+                return events.filter((e, i) => split[i][1] == filterPlayerId);
             } else {
-                return byPlayer;
+                return events.filter((e, i) => split[i][1] == filterPlayerId && split[i][0] == filterType);
             }
         } else {
             return events;
@@ -287,6 +286,7 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                         await getAssignedCards(gameId),
                         await getCenter(gameId),
                         action,
+                        (await getEvents(gameId, playerId, 'a')).map(e => e.split(':')[2]),
                     );
 
                     if (result !== false) {
