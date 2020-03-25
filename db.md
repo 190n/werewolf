@@ -12,7 +12,7 @@ What does the database currently look like?
 - `games:{gameId}:playersInGame`
     - Set of player IDs that were in the game when leader clicked Start
 - `games:{gameId}:stage`
-    - `lobby`, `cardSelection`, `viewCard`, or `turns`.
+    - `lobby`, `cardSelection`, `viewCard`, `turns`, or `discussion`.
 - `games:{gameId}:cardsInPlay`
     - list of all cards in the game (incl. center)
 - `games:{gameId}:assignedCards`

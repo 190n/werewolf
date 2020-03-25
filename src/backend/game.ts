@@ -31,8 +31,8 @@ export async function assignCards(
 // drunk precedence = 2
 export type Swap = [string | number, string | number, number];
 
-// needs to also accept a list of swaps, to handle insomniac
 // doppelganger will require a list of the center as well, to handle doppelganger drunk
+// needs to also accept previous actions, so e.g. seer can't double dip
 export function getInitialRevelation(
     playerId: string,
     assignedCards: { [id: string]: string },

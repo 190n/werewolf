@@ -56,6 +56,10 @@ const InGameDispatch = observer(({ store }: StoreProps): JSX.Element => {
         <>
             {mainComponent}
             <ul>
+                <li>
+                    You are the&nbsp;
+                    <span className={`tag ${store.ownCard}`}>{store.ownCard}</span>
+                </li>
                 {store.events.map(([type, value], i) => (
                     <li key={i}>
                         {type == 'r' ? 'Revelation' : 'Action'}:&nbsp;
