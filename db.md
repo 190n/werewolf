@@ -31,3 +31,5 @@ What does the database currently look like?
     - list of swaps that will occur in the game. format:  
         `{card1}:{card2}:{order}`  
         card1 and card2 are either a single digit (0, 1, 2; index into center) or a player ID. precedence is a number. swaps are evaluated in ascending order based on `order`.
+- `games:{gameId}:waiting`
+    - set of player IDs that can't take action yet (e.g. insomniac)

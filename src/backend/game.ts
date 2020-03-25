@@ -23,9 +23,20 @@ export async function assignCards(
     await assignCenter([shuffled[shuffled.length - 3], shuffled[shuffled.length - 2], shuffled[shuffled.length - 1]]);
 }
 
+// string means player ID
+// number means index into the center
+// last item is precedence; lower numbers are evaluated first
+// robber precedence = 0
+// troublemaker precedence = 1
+// drunk precedence = 2
+export type Swap = [string | number, string | number, number];
+
+// needs to also accept a list of swaps, to handle insomniac
+// doppelganger will require a list of the center as well, to handle doppelganger drunk
 export function getInitialRevelation(
     playerId: string,
     assignedCards: { [id: string]: string },
+    swaps: Swap[],
 ): string | undefined {
     const theirCard = assignedCards[playerId];
 
@@ -33,6 +44,20 @@ export function getInitialRevelation(
         return Object.keys(assignedCards).filter(id => id != playerId && assignedCards[id] == theirCard).join(',');
     } else if (theirCard == 'minion') {
         return Object.keys(assignedCards).filter(id => assignedCards[id] == 'werewolf').join(',');
+    } else if (theirCard == 'insomniac') {
+        if (swaps.length == 0 || !swaps.some(s => s[0] == playerId || s[1] == playerId)) {
+            // card didn't move
+            return theirCard;
+        } else {
+            // will go into another method
+            const movedCards = { ...assignedCards };
+            for (const [card1, card2] of [...swaps].sort((s1, s2) => s1[2] - s2[2])) {
+                const temp = movedCards[card1];
+                movedCards[card1] = movedCards[card2];
+                movedCards[card2] = temp;
+            }
+            return movedCards[playerId];
+        }
     } else {
         return undefined;
     }
@@ -81,14 +106,6 @@ export function isActionLegal(
     }
 }
 
-// string means player ID
-// number means index into the center
-// last item is precedence; lower numbers are evaluated first
-// robber precedence = 0
-// troublemaker precedence = 1
-// drunk precedence = 2
-export type Swap = [string | number, string | number, number];
-
 // returned a string: action was ok; send that information to the player
 // returned a bool: action was ok or not (depending on what the bool was); no new information for player
 // if it returns true, that also means that player's turn is over
@@ -135,4 +152,31 @@ export function performAction(
     }
 
     return [true, []];
+}
+
+export const dependencies: { [card: string]: string[] | undefined } = {
+    insomniac: ['robber', 'troublemaker'],
+};
+
+export function canTakeAction(
+    playerId: string,
+    assignedCards: { [id: string]: string },
+    completedTurns: string[],
+): boolean {
+    const theirCard = assignedCards[playerId],
+        deps: string[] | undefined = dependencies[theirCard];
+
+    if (deps instanceof Array) {
+        return deps.every(d => {
+            const playerAndCard = Object.entries(assignedCards).find(([p, c]) => c == d);
+
+            if (playerAndCard) {
+                return completedTurns.includes(playerAndCard[0]);
+            } else {
+                return true;
+            }
+        });
+    } else {
+        return true;
+    }
 }
