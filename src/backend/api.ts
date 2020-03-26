@@ -38,6 +38,7 @@ export default async function createApi(app: Express, redisCall: <T>(command: ke
             await redisCall('sadd', `games:${gameId}:players`, key);
             await redisCall('set', `games:${gameId}:stage`, 'lobby');
             await redisCall('set', `games:${gameId}:config:discussionLength`, '15');
+            await redisCall('hset', `games:${gameId}:nicks`, key, 'Player 1');
             res.status(201);
             res.json({ gameId, key });
         } else {
@@ -61,6 +62,8 @@ export default async function createApi(app: Express, redisCall: <T>(command: ke
             const id = await generateIdForPlayer(req.params.gameId);
             // save it to redis
             await redisCall('sadd', `games:${req.params.gameId}:players`, id);
+            const numPlayers = await redisCall<number>('scard', `games:${req.params.gameId}:players`);
+            await redisCall('hset', `games:${req.params.gameId}:nicks`, id, `Player ${numPlayers}`);
             // 201
             res.status(201);
             // return id to player

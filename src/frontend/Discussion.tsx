@@ -26,7 +26,7 @@ const Discussion = observer(({ store }: StoreProps): JSX.Element => {
                 :
                 {seconds}
             </h1>
-            <p>
+            <p className="hint">
                 Discuss what happened during the night!
             </p>
         </div>

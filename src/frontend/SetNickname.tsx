@@ -56,10 +56,10 @@ const SetNickname = observer(({ store }: StoreProps): JSX.Element => {
         setIsLoading(true);
     }
 
-    if (store.ownNickname === undefined || isDialogVisible) {
+    if (store.ownNickname?.startsWith('Player') || isDialogVisible) {
         return (
             <div className="SetNickname">
-                <h2>{store.ownNickname === undefined ? 'What\'s your name?' : 'Change nickname'}</h2>
+                <h2>{store.ownNickname?.startsWith('Player') ? 'What\'s your name?' : 'Change nickname'}</h2>
                 <SetNicknameForm onSubmit={submitNickname} />
                 <p>
                     {isLoading && 'Waiting for server...'}
