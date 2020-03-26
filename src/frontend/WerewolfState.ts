@@ -1,6 +1,6 @@
 import { observable, computed } from 'mobx';
 
-export type Stage = 'joining' | 'lobby' | 'cardSelection' | 'viewCard' | 'wait' | 'action' | 'disconnected';
+export type Stage = 'joining' | 'lobby' | 'cardSelection' | 'viewCard' | 'wait' | 'action' | 'discussion' | 'voting' | 'disconnected';
 
 export interface Player {
     id: string;
@@ -18,6 +18,7 @@ export default class WerewolfState {
     @observable public cardsInPlay: string[] = [];
     @observable public ownCard: string | undefined = undefined;
     @observable public events: ['r' | 'a', string][] = [];
+    @observable public discussionEndTime: number = -1;
 
     @computed public get me(): Player | undefined {
         return this.players.find(p => p.id == this.ownId);

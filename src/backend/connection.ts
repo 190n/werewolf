@@ -161,6 +161,30 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
         });
     }
 
+    async function checkForDiscussionEnds(callback: (gameId: string) => Promise<void>) {
+        const endTimes = await redisCall<{ [gameId: string]: string }>('hgetall', 'discussionEndTimes');
+
+        if (endTimes) {
+            for (const [gameId, endTime] of Object.entries(endTimes)) {
+                if (Date.now() / 1000 >= parseInt(endTime)) {
+                    console.log(`ending discussion for game ${gameId}`);
+                    await redisCall<number>('hdel', 'discussionEndTimes', gameId);
+                    await callback(gameId);
+                }
+            }
+        }
+
+        setTimeout(() => checkForDiscussionEnds(callback), 1000);
+    }
+
+    async function endDiscussion(gameId: string) {
+        await redisCall('set', `games:${gameId}:stage`, 'voting');
+        await broadcast(gameId, {
+            type: 'stage',
+            stage: 'voting',
+        }, true);
+    }
+
     async function handleIncomingMessage(gameId: string, playerId: string, ws: WebSocket, data: string) {
         try {
             const message = JSON.parse(data);
@@ -328,6 +352,25 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                                 type: 'stage',
                                 stage: 'wait',
                             }));
+
+                            // see if everyone has finished their action
+                            if (await redisCall<number>('scard', `games:${gameId}:completedTurns`) == await redisCall<number>('scard', `games:${gameId}:playersInGame`)) {
+                                // start discussion
+                                await redisCall('set', `games:${gameId}:stage`, 'discussion');
+                                const discussionLength = parseInt(await redisCall<string>('get', `games:${gameId}:config:discussionLength`)),
+                                    discussionEndTime = Math.floor(Date.now() / 1000) + discussionLength;
+                                console.log(`${discussionLength} seconds after ${Math.floor(Date.now() / 1000)} = ${discussionEndTime}`);
+                                await redisCall('hset', 'discussionEndTimes', gameId, discussionEndTime.toString());
+
+                                broadcast(gameId, {
+                                    type: 'stage',
+                                    stage: 'discussion',
+                                }, true);
+                                broadcast(gameId, {
+                                    type: 'discussionEndTime',
+                                    time: discussionEndTime,
+                                }, true);
+                            }
                         }
 
                         // see if that allowed new players to take actions
@@ -385,23 +428,22 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
 
             if (stage != 'lobby') {
                 if (await redisCall<number>('sismember', `games:${gameId}:playersInGame`, playerId)) {
+                    const events = await getEvents(gameId, playerId);
+                    ws.send(JSON.stringify({
+                        type: 'events',
+                        events: events.map(e => ([
+                            e.split(':')[0],
+                            e.split(':')[2],
+                        ])),
+                    }));
+
                     if (stage != 'turns') {
                         ws.send(JSON.stringify({
                             type: 'stage',
                             stage,
                         }));
                     } else {
-                        const events = await getEvents(gameId, playerId);
-                        ws.send(JSON.stringify({
-                            type: 'events',
-                            events: events.map(e => ([
-                                e.split(':')[0],
-                                e.split(':')[2],
-                            ])),
-                        }));
-
-                        //            |<--      not implemented       -->|
-                        // (insomniac AND waiting for card-moving actions) OR (has finished their turn)
+                        // (waiting for dependencies' actions) OR (has finished their turn)
                         if (
                             await redisCall<number>('sismember', `games:${gameId}:waiting`, playerId)
                             || await redisCall<number>('sismember', `games:${gameId}:completedTurns`, playerId)
@@ -439,6 +481,13 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                             card: await redisCall<string>('hget', `games:${gameId}:assignedCards`, playerId),
                         }));
                     }
+
+                    if (stage == 'discussion') {
+                        ws.send(JSON.stringify({
+                            type: 'discussionEndTime',
+                            time: parseInt(await redisCall<string>('hget', 'discussionEndTimes', gameId)),
+                        }));
+                    }
                 } else {
                     ws.send(JSON.stringify({
                         type: 'stage',
@@ -456,6 +505,8 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
             killConnection(ws, 'Game ID and player ID do not match. Make sure you typed the join code correctly.');
         }
     }
+
+    checkForDiscussionEnds(endDiscussion);
 
     return handleConnection;
 }

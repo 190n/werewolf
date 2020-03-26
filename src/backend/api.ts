@@ -37,6 +37,7 @@ export default async function createApi(app: Express, redisCall: <T>(command: ke
             await redisCall('hset', 'gameKeys', gameId, key);
             await redisCall('sadd', `games:${gameId}:players`, key);
             await redisCall('set', `games:${gameId}:stage`, 'lobby');
+            await redisCall('set', `games:${gameId}:config:discussionLength`, '15');
             res.status(201);
             res.json({ gameId, key });
         } else {

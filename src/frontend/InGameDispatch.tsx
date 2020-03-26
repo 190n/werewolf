@@ -9,6 +9,7 @@ import CardSelection from './CardSelection';
 import ViewCard from './ViewCard';
 import Wait from './Wait';
 import Turn from './Turn';
+import Discussion from './Discussion';
 
 const InGameDispatch = observer(({ store }: StoreProps): JSX.Element => {
     function onMessage({ data }: MessageEvent) {
@@ -31,6 +32,8 @@ const InGameDispatch = observer(({ store }: StoreProps): JSX.Element => {
                 store.events.push(['r', message.revelation]);
             } else if (message.type == 'events') {
                 store.events = store.events.concat(message.events);
+            } else if (message.type == 'discussionEndTime') {
+                store.discussionEndTime = message.time;
             }
         } catch (e) {}
     }
@@ -49,6 +52,8 @@ const InGameDispatch = observer(({ store }: StoreProps): JSX.Element => {
         viewCard: <ViewCard store={store} />,
         wait: <Wait store={store} />,
         action: <Turn store={store} />,
+        discussion: <Discussion store={store} />,
+        voting: <p>Vote!</p>,
         disconnected: <p>Disconnected: {store.disconnectReason}</p>,
     }[store.stage];
 

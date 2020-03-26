@@ -12,7 +12,7 @@ What does the database currently look like?
 - `games:{gameId}:playersInGame`
     - Set of player IDs that were in the game when leader clicked Start
 - `games:{gameId}:stage`
-    - `lobby`, `cardSelection`, `viewCard`, `turns`, or `discussion`.
+    - `lobby`, `cardSelection`, `viewCard`, `turns`, `discussion`, or `voting`.
 - `games:{gameId}:cardsInPlay`
     - list of all cards in the game (incl. center)
 - `games:{gameId}:assignedCards`
@@ -33,3 +33,7 @@ What does the database currently look like?
         card1 and card2 are either a single digit (0, 1, 2; index into center) or a player ID. precedence is a number. swaps are evaluated in ascending order based on `order`.
 - `games:{gameId}:waiting`
     - set of player IDs that can't take action yet (e.g. insomniac)
+- `games:{gameId}:config:discussionLength`
+    - length of the discussion, in seconds
+- `discussionEndTimes`
+    - hash mapping game ID to UNIX timestamp (in seconds) when that game's discussion will end

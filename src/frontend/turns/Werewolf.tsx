@@ -3,8 +3,11 @@ import { observer } from 'mobx-react';
 
 import { Player } from '../WerewolfState';
 import { TurnComponent } from '../Turn';
+import Tag from '../Tag';
 
 const Werewolf: TurnComponent = observer(({ players, revelations, onAction }) => {
+    const [selectedCard, setSelectedCard] = useState(-1);
+
     if (revelations.length == 0) {
         return (
             <p>
@@ -35,8 +38,6 @@ const Werewolf: TurnComponent = observer(({ players, revelations, onAction }) =>
                 );
             }
         } else {
-            const [selectedCard, setSelectedCard] = useState(-1);
-
             return (
                 <>
                     <p>
@@ -65,7 +66,14 @@ const Werewolf: TurnComponent = observer(({ players, revelations, onAction }) =>
         }
     } else {
         // we learned which card is in the center
-        return <p>not implemented</p>;
+        return (
+            <>
+                <p>
+                    That card was the <Tag card={revelations[1]} />.
+                </p>
+                <button onClick={() => onAction('')}>OK</button>
+            </>
+        );
     }
 });
 
