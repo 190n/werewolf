@@ -11,7 +11,7 @@ export interface PlayerProps {
 
 export function Player({ player: { nick }, index, isSelf }: PlayerProps): JSX.Element {
     let className = 'Player';
-    if (typeof nick != 'string') {
+    if (typeof nick != 'string' || nick.startsWith('Player')) {
         className += ' unnamed';
     }
     if (isSelf) {

@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { observer } from 'mobx-react';
 
 import { Player } from '../WerewolfState';
 import { TurnComponent } from '../Turn';
 import Tag from '../Tag';
 
-const Werewolf: TurnComponent = observer(({ players, revelations, onAction }) => {
+const Werewolf: TurnComponent = ({ players, revelations, onAction }) => {
     const [selectedCard, setSelectedCard] = useState(-1);
 
     if (revelations.length == 0) {
@@ -22,7 +21,7 @@ const Werewolf: TurnComponent = observer(({ players, revelations, onAction }) =>
                 return (
                     <>
                         <p>
-                            The other <span className="tag werewolf">Werewolf</span> is <strong>{otherWerewolves[0].nick}</strong>.
+                            The other <Tag card="werewolf" /> is <strong>{otherWerewolves[0].nick}</strong>.
                         </p>
                         <button onClick={() => onAction('')}>OK</button>
                     </>
@@ -31,7 +30,7 @@ const Werewolf: TurnComponent = observer(({ players, revelations, onAction }) =>
                 return (
                     <>
                         <p>
-                            The other <span className="tag werewolf">Werewolves</span> are <strong>{otherWerewolves[0].nick}</strong> and <strong>{otherWerewolves[1].nick}</strong>.
+                            The other <Tag card="werewolf" text="werewolves" /> are <strong>{otherWerewolves[0].nick}</strong> and <strong>{otherWerewolves[1].nick}</strong>.
                         </p>
                         <button onClick={() => onAction('')}>OK</button>
                     </>
@@ -41,7 +40,7 @@ const Werewolf: TurnComponent = observer(({ players, revelations, onAction }) =>
             return (
                 <>
                     <p>
-                        You are the only <span className="tag werewolf">Werewolf</span>. Choose a card from the center to look at:
+                        You are the only <Tag card="werewolf" />. Choose a card from the center to look at:
                     </p>
                     <p>
                         {['left', 'middle', 'right'].map((c, i) => (
@@ -75,6 +74,6 @@ const Werewolf: TurnComponent = observer(({ players, revelations, onAction }) =>
             </>
         );
     }
-});
+};
 
 export default Werewolf;

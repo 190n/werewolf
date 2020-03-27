@@ -3,6 +3,7 @@ import { observer } from 'mobx-react';
 
 import { StoreProps, Player } from './WerewolfState';
 import Werewolf from './turns/Werewolf';
+import Mason from './turns/Mason';
 import Seer from './turns/Seer';
 import useSharedSocket from './use-shared-socket';
 
@@ -18,14 +19,17 @@ const Turn = observer(({ store }: StoreProps): JSX.Element => {
         store.events.push(['a', action]);
     }
 
-    if (store.ownCard == 'werewolf') {
-        return (
-            <Werewolf
-                players={store.playersInGame}
-                revelations={store.revelations}
-                onAction={onAction}
-            />
-        );
+    if (store.ownCard == 'werewolf' || store.ownCard == 'mason') {
+        const component = {
+            werewolf: Werewolf,
+            mason: Mason,
+        }[store.ownCard];
+
+        return React.createElement(component, {
+            players: store.playersInGame,
+            revelations: store.revelations,
+            onAction,
+        });
     } else {
         return (
             <>
