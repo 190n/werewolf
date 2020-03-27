@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { Player } from '../WerewolfState';
 import { TurnComponent } from '../Turn';
 import Tag from '../Tag';
+import { getPlayersFromRevelation } from '../util';
 
 const Mason: TurnComponent = ({ players, revelations, onAction }) => {
     if (revelations.length == 0) {
@@ -12,7 +12,7 @@ const Mason: TurnComponent = ({ players, revelations, onAction }) => {
     } else {
         let message: JSX.Element;
 
-        const otherMasons = revelations[0].split(',').map(id => players.find(p => p.id == id)).filter(p => p !== undefined) as Player[];
+        const otherMasons = getPlayersFromRevelation(revelations[0], players);
         if (otherMasons.length == 0) {
             message = (
                 <p>You are the only <Tag card="mason" />.</p>

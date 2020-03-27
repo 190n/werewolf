@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { Player } from '../WerewolfState';
 import { TurnComponent } from '../Turn';
 import Tag from '../Tag';
+import { getPlayersFromRevelation } from '../util';
+import PlayerNameList from '../PlayerNameList';
 
 const Werewolf: TurnComponent = ({ players, revelations, onAction }) => {
     const [selectedCard, setSelectedCard] = useState(-1);
@@ -14,28 +16,31 @@ const Werewolf: TurnComponent = ({ players, revelations, onAction }) => {
             </p>
         );
     } else if (revelations.length == 1) {
-        const otherWerewolves = revelations[0].split(',').map(id => players.find(p => p.id == id)).filter(p => p !== undefined) as Player[];
+        const otherWerewolves = getPlayersFromRevelation(revelations[0], players);
 
         if (otherWerewolves.length > 0) {
+            let message: JSX.Element;
+
             if (otherWerewolves.length == 1) {
-                return (
-                    <>
-                        <p>
-                            The other <Tag card="werewolf" /> is <strong>{otherWerewolves[0].nick}</strong>.
-                        </p>
-                        <button onClick={() => onAction('')}>OK</button>
-                    </>
+                message = (
+                    <p>
+                        The other <Tag card="werewolf" /> is <strong>{otherWerewolves[0].nick}</strong>
+                    </p>
                 );
             } else {
-                return (
-                    <>
-                        <p>
-                            The other <Tag card="werewolf" text="werewolves" /> are <strong>{otherWerewolves[0].nick}</strong> and <strong>{otherWerewolves[1].nick}</strong>.
-                        </p>
-                        <button onClick={() => onAction('')}>OK</button>
-                    </>
+                message = (
+                    <p>
+                        The other <Tag card="werewolf" text="werewolves" /> are <PlayerNameList players={otherWerewolves} />.
+                    </p>
                 );
             }
+
+            return (
+                <>
+                    {message}
+                    <button onClick={() => onAction('')}>OK</button>
+                </>
+            );
         } else {
             return (
                 <>
