@@ -8,6 +8,7 @@ import Mason from './turns/Mason';
 import Seer from './turns/Seer';
 import Robber from './turns/Robber';
 import Troublemaker from './turns/Troublemaker';
+import Drunk from './turns/Drunk';
 import useSharedSocket from './use-shared-socket';
 
 const Turn = observer(({ store }: StoreProps): JSX.Element => {
@@ -22,7 +23,7 @@ const Turn = observer(({ store }: StoreProps): JSX.Element => {
         store.events.push(['a', action]);
     }
 
-    if (store.ownCard == 'werewolf' || store.ownCard == 'mason' || store.ownCard == 'minion' || store.ownCard == 'seer' || store.ownCard == 'robber' || store.ownCard == 'troublemaker') {
+    if (store.ownCard == 'werewolf' || store.ownCard == 'mason' || store.ownCard == 'minion' || store.ownCard == 'seer' || store.ownCard == 'robber' || store.ownCard == 'troublemaker' || store.ownCard == 'drunk') {
         const component = {
             werewolf: Werewolf,
             mason: Mason,
@@ -30,6 +31,7 @@ const Turn = observer(({ store }: StoreProps): JSX.Element => {
             seer: Seer,
             robber: Robber,
             troublemaker: Troublemaker,
+            drunk: Drunk,
         }[store.ownCard];
 
         return React.createElement(component, {
