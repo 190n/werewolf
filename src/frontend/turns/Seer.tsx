@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { TurnComponent } from '../Turn';
 import Tag from '../Tag';
 
-const Seer: TurnComponent = ({ store: { playersInGame, revelations, ownActions }, onAction }) => {
+const Seer: TurnComponent = ({ store: { playersInGame, revelations, ownActions, ownId }, onAction }) => {
     const [choice1, setChoice1] = useState(''),
         [choice2, setChoice2] = useState(''),
         [nextChoice, setNextChoice] = useState(0);
@@ -40,9 +40,9 @@ const Seer: TurnComponent = ({ store: { playersInGame, revelations, ownActions }
         return (
             <>
                 <p>
-                    Choose one player's card, or two cards in the center, to look at:
+                    Choose one other player's card, or two cards in the center, to look at:
                 </p>
-                {playersInGame.map(p => (
+                {playersInGame.filter(p => p.id != ownId).map(p => (
                     <label htmlFor={p.id} key={p.id}>
                         <input
                             type="radio"
@@ -70,15 +70,17 @@ const Seer: TurnComponent = ({ store: { playersInGame, revelations, ownActions }
                         <br />
                     </label>
                 ))}
-                <button
-                    onClick={submitChoices}
-                    disabled={
-                        (choice1.length > 1 ? false : (choice1.length == 0 || choice2.length == 0))
-                        || ownActions.length > 0
-                    }
-                >
-                    OK
-                </button>
+                <p>
+                    <button
+                        onClick={submitChoices}
+                        disabled={
+                            (choice1.length > 1 ? false : (choice1.length == 0 || choice2.length == 0))
+                            || ownActions.length > 0
+                        }
+                    >
+                        OK
+                    </button>
+                </p>
             </>
         );
     } else {
@@ -91,15 +93,15 @@ const Seer: TurnComponent = ({ store: { playersInGame, revelations, ownActions }
 
             message = (
                 <p>
-                    The {positions[0]} card was the <Tag card={cards[0]} />, and the {positions[1]}
-                    &nbsp;card was the <Tag card={cards[1]} />.
+                    The {positions[0]} card was the <Tag card={cards[0]} />, and the&nbsp;
+                    {positions[1]} card was the <Tag card={cards[1]} />.
                 </p>
             );
         } else {
             message = (
                 <p>
                     <strong>{playersInGame.find(p => p.id == ownActions[0])?.nick}</strong>
-                    's card was the <Tag card={revelations[0]} />
+                    's card was the <Tag card={revelations[0]} />.
                 </p>
             );
         }
