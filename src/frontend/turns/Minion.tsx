@@ -1,11 +1,12 @@
 import React from 'react';
+import { observer } from 'mobx-react';
 
 import { TurnComponent } from '../Turn';
 import { getPlayersFromRevelation } from '../util';
 import Tag from '../Tag';
 import PlayerNameList from '../PlayerNameList';
 
-const Minion: TurnComponent = ({ store: { playersInGame, revelations }, onAction }) => {
+const Minion: TurnComponent = observer(({ store: { playersInGame, revelations }, onAction }) => {
     if (revelations.length == 0) {
         return (
             <p>Waiting for server...</p>
@@ -35,6 +36,6 @@ const Minion: TurnComponent = ({ store: { playersInGame, revelations }, onAction
             </>
         );
     }
-};
+});
 
 export default Minion;

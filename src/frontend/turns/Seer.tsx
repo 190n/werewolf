@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
+import { observer } from 'mobx-react';
 
 import { TurnComponent } from '../Turn';
 import Tag from '../Tag';
 
-const Seer: TurnComponent = ({ store: { playersInGame, revelations, ownActions, ownId }, onAction }) => {
+const Seer: TurnComponent = observer(({ store: { playersInGame, revelations, ownActions, ownId }, onAction }) => {
     const [choice1, setChoice1] = useState(''),
         [choice2, setChoice2] = useState(''),
         [nextChoice, setNextChoice] = useState(0);
@@ -113,6 +114,6 @@ const Seer: TurnComponent = ({ store: { playersInGame, revelations, ownActions, 
             </>
         );
     }
-};
+});
 
 export default Seer;

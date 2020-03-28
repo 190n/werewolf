@@ -1,10 +1,11 @@
 import React from 'react';
+import { observer } from 'mobx-react';
 
 import { TurnComponent } from '../Turn';
 import Tag from '../Tag';
 import { getPlayersFromRevelation } from '../util';
 
-const Mason: TurnComponent = ({ store: { playersInGame, revelations }, onAction }) => {
+const Mason: TurnComponent = observer(({ store: { playersInGame, revelations }, onAction }) => {
     if (revelations.length == 0) {
         return (
             <p>Waiting for server...</p>
@@ -40,6 +41,6 @@ const Mason: TurnComponent = ({ store: { playersInGame, revelations }, onAction 
             </>
         );
     }
-};
+});
 
 export default Mason;

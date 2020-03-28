@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
+import { observer } from 'mobx-react';
 
 import { TurnComponent } from '../Turn';
 import Tag from '../Tag';
 
-const Robber: TurnComponent = ({ store: { playersInGame, revelations, ownActions, ownId }, onAction }) => {
+const Robber: TurnComponent = observer(({ store: { playersInGame, revelations, ownActions, ownId }, onAction }) => {
     const [choice, setChoice] = useState('');
 
     if (revelations.length == 0) {
@@ -43,6 +44,6 @@ const Robber: TurnComponent = ({ store: { playersInGame, revelations, ownActions
             </>
         );
     }
-};
+});
 
 export default Robber;
