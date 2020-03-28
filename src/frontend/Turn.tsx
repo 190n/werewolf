@@ -20,11 +20,12 @@ const Turn = observer(({ store }: StoreProps): JSX.Element => {
         store.events.push(['a', action]);
     }
 
-    if (store.ownCard == 'werewolf' || store.ownCard == 'mason' || store.ownCard == 'minion') {
+    if (store.ownCard == 'werewolf' || store.ownCard == 'mason' || store.ownCard == 'minion' || store.ownCard == 'seer') {
         const component = {
             werewolf: Werewolf,
             mason: Mason,
             minion: Minion,
+            seer: Seer,
         }[store.ownCard];
 
         return React.createElement(component, {
