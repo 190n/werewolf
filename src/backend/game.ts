@@ -226,3 +226,11 @@ export function canTakeAction(
         return true;
     }
 }
+
+export function isTurnImmediatelyComplete(card: string): boolean {
+    if (card == 'tanner' || card == 'hunter' || card == 'villager') {
+        return true;
+    } else {
+        return false;
+    }
+}

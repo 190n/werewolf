@@ -1,7 +1,7 @@
 import WebSocket from 'ws';
 import { Commands } from 'redis';
 
-import { assignCards, getInitialRevelation, performAction, canTakeAction, Swap } from './game';
+import { assignCards, getInitialRevelation, performAction, canTakeAction, Swap, isTurnImmediatelyComplete } from './game';
 
 interface EndMessage {
     type: 'end';
@@ -273,29 +273,37 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                         for (const p of await redisCall<string[]>('smembers', `games:${gameId}:playersInGame`)) {
                             const sock = sockets.get(p);
 
-                            if (canTakeAction(p, await getAssignedCards(gameId), [])) {
-                                sock?.send(JSON.stringify({
-                                    type: 'stage',
-                                    stage: 'action',
-                                }));
-
-                                const revelation = getInitialRevelation(p, await getAssignedCards(gameId), await getSwaps(gameId));
-
-                                if (revelation !== undefined) {
-                                    await redisCall<number>('rpush', `games:${gameId}:events`, `r:${p}:${revelation}`);
-
-                                    sock?.send(JSON.stringify({
-                                        type: 'revelation',
-                                        revelation,
-                                    }));
-                                }
-                            } else {
-                                await redisCall<number>('sadd', `games:${gameId}:waiting`, p);
-
+                            if (isTurnImmediatelyComplete(await redisCall<string>('hget', `games:${gameId}:assignedCards`, p))) {
+                                await redisCall('sadd', `games:${gameId}:completedTurns`, p);
                                 sock?.send(JSON.stringify({
                                     type: 'stage',
                                     stage: 'wait',
                                 }));
+                            } else {
+                                if (canTakeAction(p, await getAssignedCards(gameId), [])) {
+                                    sock?.send(JSON.stringify({
+                                        type: 'stage',
+                                        stage: 'action',
+                                    }));
+
+                                    const revelation = getInitialRevelation(p, await getAssignedCards(gameId), await getSwaps(gameId));
+
+                                    if (revelation !== undefined) {
+                                        await redisCall<number>('rpush', `games:${gameId}:events`, `r:${p}:${revelation}`);
+
+                                        sock?.send(JSON.stringify({
+                                            type: 'revelation',
+                                            revelation,
+                                        }));
+                                    }
+                                } else {
+                                    await redisCall<number>('sadd', `games:${gameId}:waiting`, p);
+
+                                    sock?.send(JSON.stringify({
+                                        type: 'stage',
+                                        stage: 'wait',
+                                    }));
+                                }
                             }
                         }
                     }

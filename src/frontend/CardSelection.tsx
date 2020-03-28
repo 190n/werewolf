@@ -10,9 +10,12 @@ import { cards } from '../lib/cards';
 // selectables are probably "Villager 1", "Villager 2", "Villager 3"
 // or fancier UI for how many you want
 const selectables: { [key: string]: string[] } = {
-    ...Object.fromEntries(cards.filter(c => c != 'werewolf' && c != 'mason').map(c => [c, [c]])),
+    ...Object.fromEntries(cards.filter(c => c != 'werewolf' && c != 'mason' && c != 'villager').map(c => [c, [c]])),
     werewolves: ['werewolf', 'werewolf'],
     masons: ['mason', 'mason'],
+    'villager 1': ['villager'],
+    'villager 2': ['villager'],
+    'villager 3': ['villager'],
 };
 
 interface SelectableCardProps {

@@ -24,38 +24,25 @@ const Turn = observer(({ store }: StoreProps): JSX.Element => {
         store.events.push(['a', action]);
     }
 
-    if (store.ownCard == 'werewolf' || store.ownCard == 'mason' || store.ownCard == 'minion' || store.ownCard == 'seer' || store.ownCard == 'robber' || store.ownCard == 'troublemaker' || store.ownCard == 'drunk' || store.ownCard == 'insomniac') {
-        const component = {
-            werewolf: Werewolf,
-            mason: Mason,
-            minion: Minion,
-            seer: Seer,
-            robber: Robber,
-            troublemaker: Troublemaker,
-            drunk: Drunk,
-            insomniac: Insomniac,
-        }[store.ownCard];
+    const components: { [card: string]: TurnComponent } = {
+        werewolf: Werewolf,
+        mason: Mason,
+        minion: Minion,
+        seer: Seer,
+        robber: Robber,
+        troublemaker: Troublemaker,
+        drunk: Drunk,
+        insomniac: Insomniac,
+    };
 
-        return React.createElement(component, {
+    if (components.hasOwnProperty(store.ownCard as string)) {
+        return React.createElement(components[store.ownCard as string], {
             store,
             onAction,
         });
     } else {
         return (
-            <>
-                <p>
-                    You are the&nbsp;
-                    <span className={`tag ${store.ownCard}`}>{store.ownCard}</span>
-                </p>
-                <p>
-                    <input
-                        type="text"
-                        value={action}
-                        onChange={e => setAction(e.target.value)}
-                    />
-                    <button onClick={() => onAction(action)}>Submit action</button>
-                </p>
-            </>
+            <p>Waiting for server...</p>
         );
     }
 });
