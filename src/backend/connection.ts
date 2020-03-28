@@ -144,7 +144,7 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
         );
 
         return swaps.map(s => {
-            const [c1, c2, order] = s.split(':');
+            const [playerId, c1, c2, order] = s.split(':');
 
             let card1: string | number = c1,
                 card2: string | number = c2;
@@ -157,7 +157,7 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                 card2 = parseInt(c2);
             }
 
-            return [card1, card2, parseInt(order)];
+            return [playerId, card1, card2, parseInt(order)];
         });
     }
 
@@ -331,7 +331,7 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                             await redisCall<number>(
                                 'lpush',
                                 `games:${gameId}:swaps`,
-                                ...swaps.map(([card1, card2, order]) => `${card1}:${card2}:${order}`),
+                                ...swaps.map(([p, card1, card2, order]) => `${p}:${card1}:${card2}:${order}`),
                             );
                         }
 
@@ -394,7 +394,7 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
 
                                 const revelation = getInitialRevelation(p, await getAssignedCards(gameId), await getSwaps(gameId));
                                 if (revelation !== undefined) {
-                                    await redisCall<number>('lpush', `games:${gameId}:events`, `r:${p}:${revelation}`);
+                                    await redisCall<number>('rpush', `games:${gameId}:events`, `r:${p}:${revelation}`);
                                     sock?.send(JSON.stringify({
                                         type: 'revelation',
                                         revelation,

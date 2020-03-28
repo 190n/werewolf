@@ -26,10 +26,11 @@ export async function assignCards(
 // string means player ID
 // number means index into the center
 // last item is order; lower numbers are evaluated first
+// first item is the player who did it
 // robber = 0
 // troublemaker = 1
 // drunk = 2
-export type Swap = [string | number, string | number, number];
+export type Swap = [string, string | number, string | number, number];
 
 export type CardAssignments = { [id: string]: string };
 export type Center = [string, string, string];
@@ -39,13 +40,17 @@ export function executeSwaps(
     center: Center,
     swaps: Swap[]
 ): [CardAssignments, Center] {
+    console.log('=== executeSwaps ===');
+
     const movedCards = { ...assignedCards },
         newCenter = [...center] as Center;
 
-    const sortedSwaps = [...swaps].sort((s1, s2) => s1[2] - s2[2]);
-    for (const [card1, card2] of sortedSwaps) {
+    const sortedSwaps = [...swaps].sort((s1, s2) => s1[3] - s2[3]);
+    for (const [_, card1, card2] of sortedSwaps) {
         const orig1 = (typeof card1 == 'string' ? movedCards[card1] : newCenter[card1]),
             orig2 = (typeof card2 == 'string' ? movedCards[card2] : newCenter[card2]);
+
+        console.log(`switching ${card1} (${orig1}) with ${card2} (${orig2})`);
 
         if (typeof card1 == 'string') {
             movedCards[card1] = orig2;
@@ -60,6 +65,7 @@ export function executeSwaps(
         }
     }
 
+    console.log('=== end of executeSwaps ===');
     return [movedCards, newCenter];
 }
 
@@ -76,12 +82,12 @@ export function getInitialRevelation(
     } else if (theirCard == 'minion') {
         return Object.keys(assignedCards).filter(id => assignedCards[id] == 'werewolf').join(',');
     } else if (theirCard == 'insomniac') {
-        if (swaps.length == 0 || !swaps.some(s => s[0] == playerId || s[1] == playerId)) {
+        if (swaps.length == 0 || !swaps.some(s => s[1] == playerId || s[2] == playerId)) {
             // card didn't move
             return theirCard;
         } else {
             // will go into another method
-            const [movedCards] = executeSwaps(assignedCards, ['error', 'error', 'error'], swaps.filter(([c1, c2]) => (
+            const [movedCards] = executeSwaps(assignedCards, ['error', 'error', 'error'], swaps.filter(([_, c1, c2]) => (
                 typeof c1 == 'string' && typeof c2 == 'string'
             )));
             return movedCards[playerId];
@@ -91,7 +97,6 @@ export function getInitialRevelation(
     }
 }
 
-// needs to also accept previous actions, so e.g. seer can't double dip
 export function isActionLegal(
     playerId: string,
     assignedCards: CardAssignments,
@@ -186,15 +191,15 @@ export function performAction(
         }
     } else if (theirCard == 'robber' && action != '') {
         // reveal the card they took
-        return [assignedCards[action], [[playerId, action, 0]]];
+        return [assignedCards[action], [[playerId, playerId, action, 0]]];
     } else if (theirCard == 'troublemaker') {
         // swap 'em
         const [card1, card2] = action.split(',');
-        return [true, [[card1, card2, 1]]];
+        return [true, [[playerId, card1, card2, 1]]];
     } else if (theirCard == 'drunk' && action != '') {
         // TODO: support configuring whether modified drunk is used
         // reveal the card they took
-        return [center[parseInt(action)], [[playerId, parseInt(action), 2]]];
+        return [center[parseInt(action)], [[playerId, playerId, parseInt(action), 2]]];
     }
 
     return [true, []];

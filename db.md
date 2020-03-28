@@ -29,8 +29,8 @@ What does the database currently look like?
     - set of player IDs that have completed their turn
 - `games:{gameId}:swaps`
     - list of swaps that will occur in the game. format:  
-        `{card1}:{card2}:{order}`  
-        card1 and card2 are either a single digit (0, 1, 2; index into center) or a player ID. precedence is a number. swaps are evaluated in ascending order based on `order`.
+        `{playerId}:{card1}:{card2}:{order}`  
+        `playerId` is the player who moved the cards. card1 and card2 are either a single digit (0, 1, 2; index into center) or a player ID. `order` is a number. swaps are evaluated in ascending order based on `order`.
 - `games:{gameId}:waiting`
     - set of player IDs that can't take action yet (e.g. insomniac)
 - `games:{gameId}:config:discussionLength`
