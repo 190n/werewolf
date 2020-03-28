@@ -5,13 +5,13 @@ import { getPlayersFromRevelation } from '../util';
 import Tag from '../Tag';
 import PlayerNameList from '../PlayerNameList';
 
-const Minion: TurnComponent = ({ players, revelations, onAction }) => {
+const Minion: TurnComponent = ({ store: { playersInGame, revelations }, onAction }) => {
     if (revelations.length == 0) {
         return (
             <p>Waiting for server...</p>
         );
     } else {
-        const werewolves = getPlayersFromRevelation(revelations[0], players);
+        const werewolves = getPlayersFromRevelation(revelations[0], playersInGame);
         let message: JSX.Element;
 
         if (werewolves.length == 1) {

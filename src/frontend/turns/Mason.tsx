@@ -4,7 +4,7 @@ import { TurnComponent } from '../Turn';
 import Tag from '../Tag';
 import { getPlayersFromRevelation } from '../util';
 
-const Mason: TurnComponent = ({ players, revelations, onAction }) => {
+const Mason: TurnComponent = ({ store: { playersInGame, revelations }, onAction }) => {
     if (revelations.length == 0) {
         return (
             <p>Waiting for server...</p>
@@ -12,7 +12,7 @@ const Mason: TurnComponent = ({ players, revelations, onAction }) => {
     } else {
         let message: JSX.Element;
 
-        const otherMasons = getPlayersFromRevelation(revelations[0], players);
+        const otherMasons = getPlayersFromRevelation(revelations[0], playersInGame);
         if (otherMasons.length == 0) {
             message = (
                 <p>You are the only <Tag card="mason" />.</p>

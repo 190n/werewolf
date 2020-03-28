@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react';
 
-import { StoreProps, Player } from './WerewolfState';
+import WerewolfState, { StoreProps } from './WerewolfState';
 import Werewolf from './turns/Werewolf';
 import Minion from './turns/Minion';
 import Mason from './turns/Mason';
@@ -28,8 +28,7 @@ const Turn = observer(({ store }: StoreProps): JSX.Element => {
         }[store.ownCard];
 
         return React.createElement(component, {
-            players: store.playersInGame,
-            revelations: store.revelations,
+            store,
             onAction,
         });
     } else {
@@ -55,7 +54,6 @@ const Turn = observer(({ store }: StoreProps): JSX.Element => {
 export default Turn;
 
 export type TurnComponent = (props: {
-    players: Player[],
-    revelations: string[],
+    store: WerewolfState,
     onAction: (action: string) => void,
 }) => JSX.Element;

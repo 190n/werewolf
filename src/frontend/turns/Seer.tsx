@@ -2,7 +2,7 @@ import React from 'react';
 
 import { TurnComponent } from '../Turn';
 
-const Seer: TurnComponent = ({ players, revelations, onAction }) => {
+const Seer: TurnComponent = ({ store, onAction }) => {
     return (
         <p>
             Turn for <span className="tag seer">Seer</span>

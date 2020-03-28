@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 
-import { Player } from '../WerewolfState';
 import { TurnComponent } from '../Turn';
 import Tag from '../Tag';
 import { getPlayersFromRevelation } from '../util';
 import PlayerNameList from '../PlayerNameList';
 
-const Werewolf: TurnComponent = ({ players, revelations, onAction }) => {
+const Werewolf: TurnComponent = ({ store: { playersInGame, revelations }, onAction }) => {
     const [selectedCard, setSelectedCard] = useState(-1);
 
     if (revelations.length == 0) {
@@ -16,7 +15,7 @@ const Werewolf: TurnComponent = ({ players, revelations, onAction }) => {
             </p>
         );
     } else if (revelations.length == 1) {
-        const otherWerewolves = getPlayersFromRevelation(revelations[0], players);
+        const otherWerewolves = getPlayersFromRevelation(revelations[0], playersInGame);
 
         if (otherWerewolves.length > 0) {
             let message: JSX.Element;
