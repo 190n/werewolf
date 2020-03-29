@@ -12,7 +12,7 @@ What does the database currently look like?
 - `games:{gameId}:playersInGame`
     - Set of player IDs that were in the game when leader clicked Start
 - `games:{gameId}:stage`
-    - `lobby`, `cardSelection`, `viewCard`, `turns`, `discussion`, or `voting`.
+    - `lobby`, `cardSelection`, `viewCard`, `turns`, `discussion`, `voting`, or `results`.
 - `games:{gameId}:cardsInPlay`
     - list of all cards in the game (incl. center)
 - `games:{gameId}:assignedCards`
@@ -39,3 +39,5 @@ What does the database currently look like?
     - hash mapping game ID to UNIX timestamp (in seconds) when that game's discussion will end
 - `games:{gameId}:votes`
     - hash mapping player ID to ID of who they voted for
+- `games:{gameId}:results`
+    - JSON representation of whatever getResults() returns

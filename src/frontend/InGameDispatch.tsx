@@ -35,6 +35,8 @@ const InGameDispatch = observer(({ store }: StoreProps): JSX.Element => {
                 store.events = store.events.concat(message.events);
             } else if (message.type == 'discussionEndTime') {
                 store.discussionEndTime = message.time;
+            } else if (message.type == 'results') {
+                store.results = message.results;
             }
         } catch (e) {}
     }
@@ -56,6 +58,7 @@ const InGameDispatch = observer(({ store }: StoreProps): JSX.Element => {
         discussion: <Discussion store={store} />,
         voting: <Vote store={store} />,
         disconnected: <p>Disconnected: {store.disconnectReason}</p>,
+        results: <p>Results: {JSON.stringify(store.results)}</p>,
     }[store.stage];
 
     return (

@@ -1,11 +1,23 @@
 import { observable, computed } from 'mobx';
 
-export type Stage = 'joining' | 'lobby' | 'cardSelection' | 'viewCard' | 'wait' | 'action' | 'discussion' | 'voting' | 'disconnected';
+export type Stage = 'joining' | 'lobby' | 'cardSelection' | 'viewCard' | 'wait' | 'action' | 'discussion' | 'voting' | 'results' | 'disconnected';
 
 export interface Player {
     id: string;
     nick?: string;
     isLeader: boolean;
+}
+
+export interface GameResults {
+    winners: string[];
+    winningTeam: 'werewolves' | 'tanner' | 'villagers' | 'nobody';
+    executed: string[];
+    votes: { [id: string]: string };
+    initialCards: { [id: string]: string };
+    initialCenter: [string, string, string];
+    finalCards: { [id: string]: string };
+    finalCenter: [string, string, string];
+    swaps: [string, string | number, string | number, number][];
 }
 
 export default class WerewolfState {
@@ -19,6 +31,7 @@ export default class WerewolfState {
     @observable public ownCard: string | undefined = undefined;
     @observable public events: ['r' | 'a', string][] = [];
     @observable public discussionEndTime: number = -1;
+    @observable public results: GameResults | undefined = undefined; // TODO: match type returned from getResults
 
     @computed public get me(): Player | undefined {
         return this.players.find(p => p.id == this.ownId);

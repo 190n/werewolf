@@ -1,7 +1,7 @@
 import WebSocket from 'ws';
 import { Commands } from 'redis';
 
-import { assignCards, getInitialRevelation, performAction, canTakeAction, Swap, isTurnImmediatelyComplete } from './game';
+import { assignCards, getInitialRevelation, performAction, canTakeAction, Swap, isTurnImmediatelyComplete, getResults } from './game';
 
 interface EndMessage {
     type: 'end';
@@ -422,7 +422,40 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
 
                     // check if all votes are in
                     if (await redisCall<number>('hlen', `games:${gameId}:votes`) == await redisCall<number>('scard', `games:${gameId}:playersInGame`)) {
-                        // do something
+                        await redisCall('set', `games:${gameId}:stage`, 'results');
+
+                        const initialCards = await getAssignedCards(gameId),
+                            initialCenter = await getCenter(gameId),
+                            swaps = await getSwaps(gameId),
+                            votes = await redisCall<{ [id: string]: string }>('hgetall', `games:${gameId}:votes`),
+                            results = getResults(
+                                initialCards,
+                                initialCenter,
+                                swaps,
+                                votes,
+                            );
+
+                        await redisCall('set', `games:${gameId}:results`, JSON.stringify({
+                            ...results,
+                            initialCards,
+                            initialCenter,
+                            swaps,
+                            votes,
+                        }));
+                        await broadcast(gameId, {
+                            type: 'stage',
+                            stage: 'results',
+                        }, true);
+                        await broadcast(gameId, {
+                            type: 'results',
+                            results: {
+                                ...results,
+                                initialCards,
+                                initialCenter,
+                                swaps,
+                                votes,
+                            },
+                        }, true);
                     }
                 } else {
                     killConnection(ws, 'Malformed message.');
@@ -524,6 +557,13 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                         ws.send(JSON.stringify({
                             type: 'discussionEndTime',
                             time: parseInt(await redisCall<string>('hget', 'discussionEndTimes', gameId)),
+                        }));
+                    }
+
+                    if (stage == 'results') {
+                        ws.send(JSON.stringify({
+                            type: 'results',
+                            results: JSON.parse(await redisCall<string>('get', `games:${gameId}:results`)),
                         }));
                     }
                 } else {
