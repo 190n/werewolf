@@ -37,3 +37,5 @@ What does the database currently look like?
     - length of the discussion, in seconds
 - `discussionEndTimes`
     - hash mapping game ID to UNIX timestamp (in seconds) when that game's discussion will end
+- `games:{gameId}:votes`
+    - hash mapping player ID to ID of who they voted for

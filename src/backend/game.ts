@@ -239,3 +239,84 @@ export function isTurnImmediatelyComplete(card: string): boolean {
         return false;
     }
 }
+
+export function getResults(
+    assignedCards: CardAssignments,
+    center: Center,
+    swaps: Swap[],
+    votes: { [id: string]: string }
+): {
+    winners: string[],
+    winningTeam: string,
+    executed: string[],
+    finalCards: CardAssignments,
+    finalCenter: Center,
+} {
+    // determine who is executed
+    // filter out players who voted for the center
+    const playersVotedFor = Object.values(votes).filter(vote => vote != ''),
+        // 1. find unique values in playersVotedFor
+        // 2. count occurrences of each one
+        voteCounts: [string, number][] = [...new Set(playersVotedFor)].map(p => (
+            [p, playersVotedFor.reduce((n, val) => val == p ? n + 1 : n, 0)]
+        )),
+        maxVotes = Math.max.apply(null, voteCounts.map(([p, c]) => c)),
+        executed = voteCounts.filter(([p, c]) => c == maxVotes).map(([p, c]) => p),
+        [finalCards, finalCenter] = executeSwaps(assignedCards, center, swaps);
+
+    let winningTeam: string,
+        winners: string[] = [];
+
+    // did the tanner win?
+    if (executed.some(p => finalCards[p] == 'tanner')) {
+        console.log('case 1');
+        winners = [Object.keys(finalCards).find(p => finalCards[p] == 'tanner') as string];
+        winningTeam = 'tanner';
+
+    // did anyone wake up as a werewolf?
+    } else if (Object.values(finalCards).includes('werewolf')) {
+        console.log('case 2');
+        const werewolves = Object.keys(finalCards).filter(p => finalCards[p] == 'werewolf');
+
+        // were any werewolves killed?
+        if (werewolves.some(p => executed.includes(p))) {
+            // all werewolves and minions lose
+            // villagers win
+            winners = Object.keys(finalCards).filter(p => !(['werewolf', 'minion', 'tanner'].includes(finalCards[p])));
+            winningTeam = 'villagers';
+        } else {
+            // all werewolves and minions win
+            // villagers lose
+            winners = Object.keys(finalCards).filter(p => ['werewolf', 'minion'].includes(finalCards[p]));
+            winningTeam = 'werewolves';
+        }
+
+    // did anyone wake up as the minion?
+    } else if (Object.values(finalCards).includes('minion')) {
+        console.log('case 3');
+        // minion wins as long as they survived (and the tanner wasn't executed, but that scenario
+        // has been checked by this point)
+        const minion = Object.keys(finalCards).find(p => finalCards[p] == 'minion') as string;
+        if (executed.includes(minion)) {
+            winners = Object.keys(finalCards).filter(p => !(['werewolf', 'minion', 'tanner'].includes(finalCards[p])));
+            winningTeam = 'villagers';
+        } else {
+            winners = [minion];
+            winningTeam = 'werewolves';
+        }
+    } else {
+        console.log('case 4');
+        // tanner wasn't killed
+        // no werewolves
+        // no minion
+        // current logic: villagers win as long as they didn't kill anyone
+        if (executed.length == 0) {
+            winners = Object.keys(finalCards).filter(p => finalCards[p] != 'tanner');
+            winningTeam = 'villagers';
+        } else {
+            winningTeam = 'nobody'; // oof
+        }
+    }
+
+    return { winners, winningTeam, executed, finalCards, finalCenter };
+}

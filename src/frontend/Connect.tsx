@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { observer } from 'mobx-react';
 import { ReadyState } from 'react-use-websocket';
@@ -10,7 +10,7 @@ const Connect = observer(({ store }: StoreProps): JSX.Element => {
     const { gameId, playerId } = useParams<{ gameId: string, playerId: string }>();
     const [endReason, setEndReason] = useState<string | undefined>(undefined);
 
-    const [sendMessage, lastMessage, readyState, getWebSocket] = useSharedSocket();
+    const [sendMessage, lastMessage, readyState] = useSharedSocket();
 
     const connectionStatus: string = {
         [ReadyState.CONNECTING]: 'Connecting...',

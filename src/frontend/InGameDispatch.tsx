@@ -9,6 +9,7 @@ import CardSelection from './CardSelection';
 import ViewCard from './ViewCard';
 import Wait from './Wait';
 import Turn from './Turn';
+import Vote from './Vote';
 import Discussion from './Discussion';
 
 const InGameDispatch = observer(({ store }: StoreProps): JSX.Element => {
@@ -53,7 +54,7 @@ const InGameDispatch = observer(({ store }: StoreProps): JSX.Element => {
         wait: <Wait store={store} />,
         action: <Turn store={store} />,
         discussion: <Discussion store={store} />,
-        voting: <p>Vote!</p>,
+        voting: <Vote store={store} />,
         disconnected: <p>Disconnected: {store.disconnectReason}</p>,
     }[store.stage];
 

@@ -406,6 +406,24 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                         // illegal action
                         killConnection(ws, 'Illegal action.');
                     }
+                } else if (
+                    message.type == 'vote'
+                    && await redisCall<string>('get', `games:${gameId}:stage`) == 'voting'
+                    && await redisCall<number>('sismember', `games:${gameId}:playersInGame`, playerId)
+                    && (message.vote == '' || await redisCall<number>('sismember', `games:${gameId}:playersInGame`, message.vote))
+                    && !(await redisCall<number>('hexists', `games:${gameId}:votes`, playerId))
+                ) {
+                    // tally the vote
+                    await redisCall('hset', `games:${gameId}:votes`, playerId, message.vote);
+                    ws.send(JSON.stringify({
+                        type: 'stage',
+                        stage: 'wait',
+                    }));
+
+                    // check if all votes are in
+                    if (await redisCall<number>('hlen', `games:${gameId}:votes`) == await redisCall<number>('scard', `games:${gameId}:playersInGame`)) {
+                        // do something
+                    }
                 } else {
                     killConnection(ws, 'Malformed message.');
                 }
@@ -445,12 +463,12 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                         ])),
                     }));
 
-                    if (stage != 'turns') {
+                    if (stage != 'turns' && stage != 'voting') {
                         ws.send(JSON.stringify({
                             type: 'stage',
                             stage,
                         }));
-                    } else {
+                    } else if (stage == 'turns') {
                         // (waiting for dependencies' actions) OR (has finished their turn)
                         if (
                             await redisCall<number>('sismember', `games:${gameId}:waiting`, playerId)
@@ -464,6 +482,18 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                             ws.send(JSON.stringify({
                                 type: 'stage',
                                 stage: 'action',
+                            }));
+                        }
+                    } else {
+                        if (await redisCall<number>('hexists', `games:${gameId}:votes`, playerId)) {
+                            ws.send(JSON.stringify({
+                                type: 'stage',
+                                stage: 'wait',
+                            }));
+                        } else {
+                            ws.send(JSON.stringify({
+                                type: 'stage',
+                                stage: 'voting',
                             }));
                         }
                     }

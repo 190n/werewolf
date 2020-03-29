@@ -15,7 +15,7 @@ export default function useSharedSocket(options: Omit<Options, 'share' | 'queryP
         queryParams: { gameId, playerId },
         retryOnError: true,
         ...options,
-    }), []);
+    }), [options]);
 
     return useWebSocket('ws://localhost:5000/connect', fullOptions);
 }
