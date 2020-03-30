@@ -10,6 +10,7 @@ import ViewCard from './ViewCard';
 import Wait from './Wait';
 import Turn from './Turn';
 import Vote from './Vote';
+import Results from './Results';
 import Discussion from './Discussion';
 
 const InGameDispatch = observer(({ store }: StoreProps): JSX.Element => {
@@ -57,8 +58,8 @@ const InGameDispatch = observer(({ store }: StoreProps): JSX.Element => {
         action: <Turn store={store} />,
         discussion: <Discussion store={store} />,
         voting: <Vote store={store} />,
+        results: <Results store={store} />,
         disconnected: <p>Disconnected: {store.disconnectReason}</p>,
-        results: <p>Results: {JSON.stringify(store.results)}</p>,
     }[store.stage];
 
     return (

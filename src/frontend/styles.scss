@@ -134,4 +134,18 @@ $cards: (
             font-size: 1.5rem;
         }
     }
+
+    .Results {
+        h1 {
+            font-size: 3rem;
+        }
+
+        .cards-reveal {
+            div {
+                display: inline-block;
+                width: 50%;
+                max-width: 400px;
+            }
+        }
+    }
 }
