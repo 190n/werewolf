@@ -108,7 +108,7 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
             ) {
                 // keep game around for ten minutes
                 console.log(`starting expiration timer on game ${gameId}`);
-                await redisCall('hset', 'expirationTimes', gameId, Math.floor(Date.now() / 1000 + 10).toString());
+                await redisCall('hset', 'expirationTimes', gameId, Math.floor(Date.now() / 1000 + 600).toString());
             }
         });
         return true;

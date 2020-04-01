@@ -38,7 +38,6 @@ export default async function createApi(app: Express, redisCall: <T>(command: ke
             return;
         }
 
-        // need to require a nickname
         const gameId = await createGameId(),
             key = generateId(16, 0);
         if (gameId != null) {
@@ -47,6 +46,8 @@ export default async function createApi(app: Express, redisCall: <T>(command: ke
             await redisCall('set', `games:${gameId}:stage`, 'lobby');
             await redisCall('set', `games:${gameId}:config:discussionLength`, '15');
             await redisCall('hset', `games:${gameId}:nicks`, key, nick);
+            // game will be deleted of no one connects
+            await redisCall('hset', 'expirationTimes', gameId, Math.floor(Date.now() / 1000 + 600).toString());
             res.status(201);
             res.json({ gameId, key });
         } else {
