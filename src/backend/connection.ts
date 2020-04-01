@@ -93,11 +93,23 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
         });
         ws.on('close', async () => {
             // remove from stored sockets
-            (openSockets.get(gameId) as Map<string, WebSocket>).delete(playerId);
+            const gameSockets = openSockets.get(gameId);
+            if (gameSockets !== undefined) {
+                gameSockets.delete(playerId);
+            }
             // remove from redis
             await redisCall('srem', `games:${gameId}:connected`, playerId);
             // if leader...do something
             console.log(`lost connection to game ${gameId} from player ${playerId}`);
+
+            if (
+                await redisCall<number>('scard', `games:${gameId}:connected`) == 0
+                && await redisCall<number>('hexists', 'gameKeys', gameId)
+            ) {
+                // keep game around for ten minutes
+                console.log(`starting expiration timer on game ${gameId}`);
+                await redisCall('hset', 'expirationTimes', gameId, Math.floor(Date.now() / 1000 + 10).toString());
+            }
         });
         return true;
     }
@@ -161,20 +173,31 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
         });
     }
 
-    async function checkForDiscussionEnds(callback: (gameId: string) => Promise<void>) {
-        const endTimes = await redisCall<{ [gameId: string]: string }>('hgetall', 'discussionEndTimes');
+    async function runChecksInBackground(endDiscussion: (gameId: string) => Promise<void>, destroyGame: (gameId: string) => Promise<void>) {
+        const endTimes = await redisCall<{ [gameId: string]: string }>('hgetall', 'discussionEndTimes'),
+            expirationTimes = await redisCall<{ [gameId: string]: string }>('hgetall', 'expirationTimes');
 
         if (endTimes) {
             for (const [gameId, endTime] of Object.entries(endTimes)) {
                 if (Date.now() / 1000 >= parseInt(endTime)) {
                     console.log(`ending discussion for game ${gameId}`);
-                    await redisCall<number>('hdel', 'discussionEndTimes', gameId);
-                    await callback(gameId);
+                    await redisCall('hdel', 'discussionEndTimes', gameId);
+                    await endDiscussion(gameId);
                 }
             }
         }
 
-        setTimeout(() => checkForDiscussionEnds(callback), 1000);
+        if (expirationTimes) {
+            for (const [gameId, expirationTime] of Object.entries(expirationTimes)) {
+                if (Date.now() / 1000 >= parseInt(expirationTime)) {
+                    console.log(`destroying game ${gameId}`);
+                    await redisCall('hdel', 'expirationTimes', gameId);
+                    await destroyGame(gameId);
+                }
+            }
+        }
+
+        setTimeout(() => runChecksInBackground(endDiscussion, destroyGame), 1000);
     }
 
     async function endDiscussion(gameId: string) {
@@ -183,6 +206,43 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
             type: 'stage',
             stage: 'voting',
         }, true);
+    }
+
+    async function destroyGame(gameId: string) {
+        // gameKeys signals to ws close handler that it shouldn't expire the game
+        await redisCall('hdel', 'gameKeys', gameId);
+
+        // check for anyone connected and kill their connections
+        const connections = openSockets.get(gameId);
+        if (connections !== undefined) {
+            for (const ws of connections.values()) {
+                killConnection(ws, 'That game has ended.');
+            }
+        }
+
+        openSockets.delete(gameId);
+
+        // delete everything else in redis
+        await redisCall('hdel', 'discussionEndTimes', gameId);
+        await redisCall('hdel', 'expirationTimes', gameId);
+        await redisCall('del', ...[
+            'players',
+            'connected',
+            'nicks',
+            'playersInGame',
+            'stage',
+            'cardsInPlay',
+            'assignedCards',
+            'center',
+            'haveConfirmed',
+            'events',
+            'completedTurns',
+            'swaps',
+            'waiting',
+            'config:discussionLength',
+            'votes',
+            'results',
+       ].map(k => `games:${gameId}:${k}`));
     }
 
     async function handleIncomingMessage(gameId: string, playerId: string, ws: WebSocket, data: string) {
@@ -483,6 +543,12 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
             // send list of players
             await broadcastPlayerList(gameId);
 
+            // don't destroy the game
+            if (await redisCall<number>('hexists', 'expirationTimes', gameId)) {
+                console.log(`Cancelling expiration for ${gameId}`);
+            }
+            await redisCall('hdel', 'expirationTimes', gameId);
+
             const stage = await redisCall<string>('get', `games:${gameId}:stage`);
 
             if (stage != 'lobby') {
@@ -584,7 +650,7 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
         }
     }
 
-    checkForDiscussionEnds(endDiscussion);
+    runChecksInBackground(endDiscussion, destroyGame);
 
     return handleConnection;
 }

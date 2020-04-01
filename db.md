@@ -41,3 +41,5 @@ What does the database currently look like?
     - hash mapping player ID to ID of who they voted for
 - `games:{gameId}:results`
     - JSON representation of whatever getResults() returns
+- `expirationTimes`
+    - hash mapping game ID to UNIX timestamp (in seconds) when that game will be destroyed

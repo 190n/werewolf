@@ -24,7 +24,7 @@ export default function Create(): JSX.Element {
         if (nick.length > 0 && submitted) {
             createGame();
         }
-    });
+    }, [submitted]);
 
     if (gameId && playerId) {
         return <Redirect to={`/${gameId}/${playerId}/play`} />;
