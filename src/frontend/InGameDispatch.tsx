@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { observer } from 'mobx-react';
 
 import useSharedSocket from './use-shared-socket';
@@ -14,6 +14,13 @@ import Results from './Results';
 import Discussion from './Discussion';
 
 const InGameDispatch = observer(({ store }: StoreProps): JSX.Element => {
+    useEffect(() => {
+        document.title = `${store.ownNickname} | ${store.gameId} | Werewolf`;
+        return () => {
+            document.title = 'Werewolf';
+        };
+    }, [store.ownNickname, store.gameId]);
+
     function onMessage({ data }: MessageEvent) {
         try {
             const message = JSON.parse(data);

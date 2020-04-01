@@ -31,6 +31,14 @@ export default async function createApi(app: Express, redisCall: <T>(command: ke
     }
 
     app.get('/games/create', async (req, res) => {
+        const { nick } = req.query;
+        if (!nick) {
+            res.status(400);
+            res.json({ gameId: null, key: null, error: 'Nickname (nick) must be specified in querystring.' });
+            return;
+        }
+
+        // need to require a nickname
         const gameId = await createGameId(),
             key = generateId(16, 0);
         if (gameId != null) {
@@ -38,7 +46,7 @@ export default async function createApi(app: Express, redisCall: <T>(command: ke
             await redisCall('sadd', `games:${gameId}:players`, key);
             await redisCall('set', `games:${gameId}:stage`, 'lobby');
             await redisCall('set', `games:${gameId}:config:discussionLength`, '15');
-            await redisCall('hset', `games:${gameId}:nicks`, key, 'Player 1');
+            await redisCall('hset', `games:${gameId}:nicks`, key, nick);
             res.status(201);
             res.json({ gameId, key });
         } else {
@@ -55,15 +63,35 @@ export default async function createApi(app: Express, redisCall: <T>(command: ke
         res.end((await redisCall<number>('del', 'gameKeys')).toString());
     });
 
-    app.get('/games/:gameId/join', async (req, res) => {
+    app.get('/games/join', async (req, res) => {
+        const { gameId, nick } = req.query;
+
+        if (gameId === undefined || nick === undefined) {
+            res.status(400);
+            res.json({ id: null, error: 'Must specify gameId and nick in querystring.' });
+            return;
+        }
+
+        if (nick == '') {
+            res.status(400);
+            res.json({ id: null, error: 'Your nickname cannot be empty.' });
+            return;
+        }
+
         // game exists?
-        if (await redisCall<number>('hexists', 'gameKeys', req.params.gameId)) {
+        if (await redisCall<number>('hexists', 'gameKeys', gameId)) {
+            // nickname taken?
+            if ((await redisCall<string[]>('hvals', `games:${gameId}:nicks`)).includes(nick)) {
+                res.status(403);
+                res.json({ id: null, error: 'That nickname is taken.' });
+                return;
+            }
+
             // generate an id
-            const id = await generateIdForPlayer(req.params.gameId);
+            const id = await generateIdForPlayer(gameId);
             // save it to redis
-            await redisCall('sadd', `games:${req.params.gameId}:players`, id);
-            const numPlayers = await redisCall<number>('scard', `games:${req.params.gameId}:players`);
-            await redisCall('hset', `games:${req.params.gameId}:nicks`, id, `Player ${numPlayers}`);
+            await redisCall('sadd', `games:${gameId}:players`, id);
+            await redisCall('hset', `games:${gameId}:nicks`, id, nick);
             // 201
             res.status(201);
             // return id to player
