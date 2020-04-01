@@ -6,9 +6,6 @@ import { StoreProps } from './WerewolfState';
 import useSharedSocket from './use-shared-socket';
 import { cards } from '../lib/cards';
 
-// TODO: allow multiple villagers
-// selectables are probably "Villager 1", "Villager 2", "Villager 3"
-// or fancier UI for how many you want
 const selectables: { [key: string]: string[] } = {
     ...Object.fromEntries(cards.filter(c => c != 'werewolf' && c != 'mason' && c != 'villager').map(c => [c, [c]])),
     werewolves: ['werewolf', 'werewolf'],

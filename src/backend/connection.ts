@@ -41,7 +41,7 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
         }));
     }
 
-    async function broadcast(gameId: string, message: object, inGameOnly: boolean = true): Promise<void> {
+    async function broadcast(gameId: string, message: object, inGameOnly: boolean): Promise<void> {
         if (!openSockets.has(gameId)) return;
         const sockets = openSockets.get(gameId) as Map<string, WebSocket>;
         if (inGameOnly) {
@@ -283,7 +283,7 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                     broadcast(gameId, {
                         type: 'cardsInPlay',
                         cardsInPlay: message.cardsInPlay,
-                    });
+                    }, true);
                 } else if (
                     message.type == 'confirmCards'
                         && message.cardsInPlay instanceof Array
@@ -296,11 +296,11 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                     broadcast(gameId, {
                         type: 'cardsInPlay',
                         cardsInPlay: message.cardsInPlay,
-                    });
+                    }, true);
                     broadcast(gameId, {
                         type: 'stage',
                         stage: 'viewCard',
-                    });
+                    }, true);
 
                     await assignCards(
                         await redisCall<string[]>('smembers', `games:${gameId}:playersInGame`),
@@ -517,6 +517,27 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                             },
                         }, true);
                     }
+                } else if (message.type == 'restart' && await isLeader(gameId, playerId)) {
+                    await redisCall('set', `games:${gameId}:stage`, 'lobby');
+                    await redisCall('del', ...[
+                        'playersInGame',
+                        'cardsInPlay',
+                        'assignedCards',
+                        'center',
+                        'haveConfirmed',
+                        'events',
+                        'completedTurns',
+                        'swaps',
+                        'waiting',
+                        'votes',
+                        'results'
+                    ].map(k => `games:${gameId}:${k}`));
+                    await redisCall('hdel', 'discussionEndTimes', gameId);
+
+                    await broadcast(gameId, {
+                        type: 'stage',
+                        stage: 'lobby',
+                    }, false);
                 } else {
                     killConnection(ws, 'Malformed message.');
                 }

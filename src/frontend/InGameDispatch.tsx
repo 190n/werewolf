@@ -54,7 +54,7 @@ const InGameDispatch = observer(({ store }: StoreProps): JSX.Element => {
         store.disconnectReason = reason;
     }
 
-    useSharedSocket({ onMessage, onClose });
+    const [sendMessage] = useSharedSocket({ onMessage, onClose });
 
     const mainComponent = {
         joining: <Connect store={store} />,
@@ -84,6 +84,9 @@ const InGameDispatch = observer(({ store }: StoreProps): JSX.Element => {
                     </li>
                 ))}
             </ul>
+            {store.isLeader && (
+                <button onClick={() => confirm('Are you sure?') && sendMessage(JSON.stringify({ type: 'restart' }))}>Restart game</button>
+            )}
         </>
     );
 });

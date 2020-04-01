@@ -57,8 +57,8 @@ const Results = observer(({ store: { results, ownId, playersInGame } }: StorePro
                             ))}
                             <br />
                             <li>
-                                Cards in center: {results.initialCenter.map(card => (
-                                    <><Tag card={card} /> </>
+                                Cards in center: {results.initialCenter.map((card, i) => (
+                                    <React.Fragment key={i}><Tag card={card} /> </React.Fragment>
                                 ))}
                             </li>
                         </ul>
