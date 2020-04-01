@@ -36,18 +36,19 @@ const SelectableCard = ({
 );
 
 
-const CardSelection = observer(({ store }: StoreProps): JSX.Element => {
-    const sortedKeys = useMemo(() => Object.keys(selectables).sort((a, b) => cards.indexOf(selectables[a][0]) - cards.indexOf(selectables[b][0])), []);
+const GameConfiguration = observer(({ store }: StoreProps): JSX.Element => {
+    const sortedKeys = useMemo(() => Object.keys(selectables).sort((a, b) => cards.indexOf(selectables[a][0]) - cards.indexOf(selectables[b][0])), []),
+        [selected, setSelected] = useState(Set<string>()),
+        [isConfirming, setIsConfirming] = useState(false),
+        [sendMessage] = useSharedSocket(),
+        [discussionLengthMinutes, setDiscussionLengthMinutes] = useState('5');
 
     if (store.isLeader) {
-        const [selected, setSelected] = useState(Set<string>());
-        const [isConfirming, setIsConfirming] = useState(false);
-        const [sendMessage] = useSharedSocket();
-
         function sendCards(newCards: Set<string>, final: boolean = false) {
             sendMessage(JSON.stringify({
                 type: final ? 'confirmCards' : 'cardsInPlay',
                 cardsInPlay: newCards.toArray().map(s => selectables[s]).flat(1),
+                discussionLength: parseInt(discussionLengthMinutes) * 60,
             }));
         }
 
@@ -73,7 +74,7 @@ const CardSelection = observer(({ store }: StoreProps): JSX.Element => {
             numExpected = store.playerIdsInGame.length + 3;
 
         return (
-            <div className={isConfirming ? 'CardSelection confirm' : 'CardSelection'}>
+            <div className={isConfirming ? 'GameConfiguration confirm' : 'GameConfiguration'}>
                 <h1>{isConfirming ? 'Confirm card selection' : 'Choose cards'}</h1>
                 {sortedKeys.map(s => (
                     <SelectableCard
@@ -101,14 +102,33 @@ const CardSelection = observer(({ store }: StoreProps): JSX.Element => {
                     Select {numExpected} cards for a game with {store.playerIdsInGame.length} players.
                 </p>
                 <p>
+                    <label htmlFor="discussionLength">
+                        Discussion length:&nbsp;
+                        <input
+                            type="text"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            size={2}
+                            value={discussionLengthMinutes}
+                            onChange={e => setDiscussionLengthMinutes(e.target.value)}
+                            id="discussionLength"
+                        />
+                        &nbsp; minutes
+                    </label>
+                </p>
+                <p>
                     {numSelected == numExpected ? (
-                        isConfirming ? (
-                            <>
-                                <button onClick={() => sendCards(selected, true)}>Confirm</button>
-                                <button onClick={() => setIsConfirming(false)}>Cancel</button>
-                            </>
+                        Number.isNaN(parseInt(discussionLengthMinutes)) ? (
+                            'Enter the length of the discussion'
                         ) : (
-                            <button onClick={() => setIsConfirming(true)}>Start game</button>
+                            isConfirming ? (
+                                <>
+                                    <button onClick={() => sendCards(selected, true)}>Confirm</button>
+                                    <button onClick={() => setIsConfirming(false)}>Cancel</button>
+                                </>
+                            ) : (
+                                <button onClick={() => setIsConfirming(true)}>Start game</button>
+                            )
                         )
                     ) : (
                         `Select ${Math.abs(numSelected - numExpected)}
@@ -121,7 +141,7 @@ const CardSelection = observer(({ store }: StoreProps): JSX.Element => {
         );
     } else {
         return (
-            <div className="CardSelection">
+            <div className="GameConfiguration">
                 <h1>Leader is choosing cards</h1>
                 {sortedKeys.map(s => (
                     <SelectableCard
@@ -137,4 +157,4 @@ const CardSelection = observer(({ store }: StoreProps): JSX.Element => {
     }
 });
 
-export default CardSelection;
+export default GameConfiguration;

@@ -287,11 +287,13 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                 } else if (
                     message.type == 'confirmCards'
                         && message.cardsInPlay instanceof Array
+                        && typeof message.discussionLength == 'number'
                         && await isLeader(gameId, playerId)
                         && message.cardsInPlay.length == await redisCall<number>('scard', `games:${gameId}:playersInGame`) + 3
                 ) {
-                    await redisCall<number>('lpush', `games:${gameId}:cardsInPlay`, ...message.cardsInPlay);
-                    await redisCall<number>('set', `games:${gameId}:stage`, 'viewCard');
+                    await redisCall('lpush', `games:${gameId}:cardsInPlay`, ...message.cardsInPlay);
+                    await redisCall('set', `games:${gameId}:stage`, 'viewCard');
+                    await redisCall('set', `games:${gameId}:config:discussionLength`, message.discussionLength.toString());
 
                     broadcast(gameId, {
                         type: 'cardsInPlay',

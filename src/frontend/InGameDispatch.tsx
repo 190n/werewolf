@@ -5,7 +5,7 @@ import useSharedSocket from './use-shared-socket';
 import { StoreProps } from './WerewolfState';
 import Connect from './Connect';
 import Lobby from './Lobby';
-import CardSelection from './CardSelection';
+import GameConfiguration from './GameConfiguration';
 import ViewCard from './ViewCard';
 import Wait from './Wait';
 import Turn from './Turn';
@@ -59,7 +59,7 @@ const InGameDispatch = observer(({ store }: StoreProps): JSX.Element => {
     const mainComponent = {
         joining: <Connect store={store} />,
         lobby: <Lobby store={store} />,
-        cardSelection: <CardSelection store={store} />,
+        cardSelection: <GameConfiguration store={store} />,
         viewCard: <ViewCard store={store} />,
         wait: <Wait store={store} />,
         action: <Turn store={store} />,
