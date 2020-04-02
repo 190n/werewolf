@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Redirect, Link } from 'react-router-dom';
 
+import { backendBaseUrl } from './config';
+
 export default function Create(): JSX.Element {
     const [gameId, setGameId] = useState(''),
         [playerId, setPlayerId] = useState(''),
@@ -9,7 +11,7 @@ export default function Create(): JSX.Element {
         [submitted, setSubmitted] = useState(false);
 
     async function createGame() {
-        const response = await (await fetch(`http://localhost:5000/games/create?nick=${nick}`)).json();
+        const response = await (await fetch(`${backendBaseUrl}/games/create?nick=${nick}`)).json();
 
         if (typeof response.gameId == 'string' && typeof response.key == 'string') {
             setGameId(response.gameId);

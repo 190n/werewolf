@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 import { SendMessage, Options } from 'react-use-websocket/src/lib/use-websocket';
 
+import { backendBaseSocketUrl } from './config';
+
 export default function useSharedSocket(options: Omit<Options, 'share' | 'queryParams' | 'retryOnError'> = {}): [SendMessage, MessageEvent, ReadyState, () => WebSocket] {
     const { gameId, playerId } = useParams();
 
@@ -17,5 +19,5 @@ export default function useSharedSocket(options: Omit<Options, 'share' | 'queryP
         ...options,
     }), []);
 
-    return useWebSocket('ws://localhost:5000/connect', fullOptions);
+    return useWebSocket(`${backendBaseSocketUrl}/connect`, fullOptions);
 }

@@ -5,6 +5,7 @@ import { StoreProps } from './WerewolfState';
 import PlayerList from './PlayerList';
 import SetNickname from './SetNickname';
 import useSharedSocket from './use-shared-socket';
+import { frontendBaseUrl } from './config';
 
 const Lobby = observer(({ store }: StoreProps): JSX.Element => {
     const [sendMessage] = useSharedSocket();
@@ -28,7 +29,7 @@ const Lobby = observer(({ store }: StoreProps): JSX.Element => {
                 Join code: {store.gameId}
             </p>
             <p>
-                Link to join: <a href={`http://localhost:1234/${store.gameId}`}>http://localhost:1234/{store.gameId}</a>
+                Link to join: <a href={`${frontendBaseUrl}/${store.gameId}`}>{frontendBaseUrl}/{store.gameId}</a>
             </p>
             <PlayerList store={store} />
             {store.isLeader && (

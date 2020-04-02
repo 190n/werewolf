@@ -31,7 +31,7 @@ export default class WerewolfState {
     @observable public ownCard: string | undefined = undefined;
     @observable public events: ['r' | 'a', string][] = [];
     @observable public discussionEndTime: number = -1;
-    @observable public results: GameResults | undefined = undefined; // TODO: match type returned from getResults
+    @observable public results: GameResults | undefined = undefined;
 
     @computed public get me(): Player | undefined {
         return this.players.find(p => p.id == this.ownId);

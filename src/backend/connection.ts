@@ -675,5 +675,12 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
 
     runChecksInBackground(endDiscussion, destroyGame);
 
+    // set expiration timers on all games in case no one connects
+    (async () => {
+        for (const gameId of await redisCall<string[]>('hkeys', 'gameKeys')) {
+            await redisCall('hset', 'expirationTimes', gameId, Math.floor(Date.now() / 1000 + 600).toString());
+        }
+    })();
+
     return handleConnection;
 }

@@ -3,6 +3,7 @@ import { Link, Redirect, useParams } from 'react-router-dom';
 import { observer } from 'mobx-react';
 
 import { StoreProps } from './WerewolfState';
+import { backendBaseUrl } from './config';
 
 const Join = observer(({ store }: StoreProps): JSX.Element => {
     const { gameId } = useParams(),
@@ -15,7 +16,7 @@ const Join = observer(({ store }: StoreProps): JSX.Element => {
             return;
         }
 
-        const response = await (await fetch(`http://localhost:5000/games/join?gameId=${gameId}&nick=${encodeURIComponent(nick)}`)).json();
+        const response = await (await fetch(`${backendBaseUrl}/games/join?gameId=${gameId}&nick=${encodeURIComponent(nick)}`)).json();
 
         if (response.error != null) {
             setError(response.error);
