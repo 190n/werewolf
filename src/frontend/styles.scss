@@ -1,6 +1,6 @@
 @use "sass:color";
 
-$font: "Roboto";
+$font: "Source Sans Pro", sans-serif;
 
 $cards: (
     "doppelganger": #00a0c0,
@@ -128,6 +128,14 @@ $cards: (
         .countdown {
             font-size: 8rem;
             margin-bottom: 0;
+
+            &.last-minute {
+                color: #600000;
+            }
+
+            &.last-seconds {
+                color: #c00000;
+            }
         }
 
         .hint {

@@ -21,7 +21,7 @@ const Discussion = observer(({ store }: StoreProps): JSX.Element => {
 
     return (
         <div className="Discussion">
-            <h1 className="countdown">
+            <h1 className={totalSeconds < 60 ? (totalSeconds < 10 ? 'countdown last-seconds' : 'countdown last-minute') : 'countdown'}>
                 {minutes}
                 :
                 {seconds}

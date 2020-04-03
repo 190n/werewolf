@@ -29,6 +29,15 @@ const InGameDispatch = observer(({ store }: StoreProps): JSX.Element => {
                 store.disconnectReason = message.reason;
             } else if (message.type == 'stage') {
                 store.stage = message.stage;
+
+                if (message.restart) {
+                    store.playerIdsInGame = [];
+                    store.cardsInPlay = [];
+                    store.ownCard = undefined;
+                    store.events = [];
+                    store.discussionEndTime = -1;
+                    store.results = undefined;
+                }
             } else if (message.type == 'players') {
                 store.players = message.players;
             } else if (message.type == 'playersInGame') {

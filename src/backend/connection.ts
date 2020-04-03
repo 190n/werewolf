@@ -539,6 +539,7 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                     await broadcast(gameId, {
                         type: 'stage',
                         stage: 'lobby',
+                        restart: true,
                     }, false);
                 } else {
                     killConnection(ws, 'Malformed message.');

@@ -45,7 +45,7 @@ export default async function createApi(app: Express, redisCall: <T>(command: ke
             await redisCall('sadd', `games:${gameId}:players`, key);
             await redisCall('set', `games:${gameId}:stage`, 'lobby');
             await redisCall('hset', `games:${gameId}:nicks`, key, nick);
-            // game will be deleted of no one connects
+            // game will be deleted if no one connects
             await redisCall('hset', 'expirationTimes', gameId, Math.floor(Date.now() / 1000 + 600).toString());
             res.status(201);
             res.json({ gameId, key });
