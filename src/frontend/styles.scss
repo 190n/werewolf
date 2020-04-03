@@ -20,6 +20,11 @@ $cards: (
 #app {
     font-family: $font;
     text-align: center;
+    font-size: 20px;
+
+    button, input {
+        font-family: $font;
+    }
 
     a > [disabled] {
         cursor: default;
@@ -113,7 +118,7 @@ $cards: (
     .tag {
         color: white;
         padding: 2px 6px;
-        border-radius: 13px;
+        border-radius: 1em;
         font-weight: bold;
         text-transform: capitalize;
 

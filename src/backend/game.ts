@@ -267,6 +267,15 @@ export function getResults(
     let winningTeam: string,
         winners: string[] = [];
 
+    // handle the hunter
+    for (const [player, card] of Object.entries(finalCards)) {
+        if (card == 'hunter') {
+            if (executed.includes(player) && votes[player]) {
+                executed.push(votes[player]);
+            }
+        }
+    }
+
     // did the tanner win?
     if (executed.some(p => finalCards[p] == 'tanner')) {
         console.log('case 1');
