@@ -43,3 +43,5 @@ What does the database currently look like?
     - JSON representation of whatever getResults() returns
 - `expirationTimes`
     - hash mapping game ID to UNIX timestamp (in seconds) when that game will be destroyed
+- `forcedWaits`
+    - hash of players that are being forced to wait (e.g. insomniac, so they can't learn about cards that were dealt. key is `{gameId}:{playerId}` and value is a UNIX timestamp in seconds. players added to this are also added to `games:{gameId}:waiting`.

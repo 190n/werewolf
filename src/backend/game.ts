@@ -329,3 +329,7 @@ export function getResults(
 
     return { winners, winningTeam, executed, finalCards, finalCenter };
 }
+
+export function mayWait(card: string): boolean {
+    return card == 'insomniac';
+}

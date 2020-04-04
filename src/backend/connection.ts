@@ -1,7 +1,16 @@
 import WebSocket from 'ws';
 import { Commands } from 'redis';
 
-import { assignCards, getInitialRevelation, performAction, canTakeAction, Swap, isTurnImmediatelyComplete, getResults } from './game';
+import {
+    assignCards,
+    getInitialRevelation,
+    performAction,
+    canTakeAction,
+    Swap,
+    isTurnImmediatelyComplete,
+    getResults,
+    mayWait,
+} from './game';
 
 interface EndMessage {
     type: 'end';
@@ -173,9 +182,10 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
         });
     }
 
-    async function runChecksInBackground(endDiscussion: (gameId: string) => Promise<void>, destroyGame: (gameId: string) => Promise<void>) {
+    async function runChecksInBackground(): Promise<void> {
         const endTimes = await redisCall<{ [gameId: string]: string }>('hgetall', 'discussionEndTimes'),
-            expirationTimes = await redisCall<{ [gameId: string]: string }>('hgetall', 'expirationTimes');
+            expirationTimes = await redisCall<{ [gameId: string]: string }>('hgetall', 'expirationTimes'),
+            forcedWaits = await redisCall<{ [gameAndPlayer: string]: string }>('hgetall', 'forcedWaits');
 
         if (endTimes) {
             for (const [gameId, endTime] of Object.entries(endTimes)) {
@@ -197,7 +207,18 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
             }
         }
 
-        setTimeout(() => runChecksInBackground(endDiscussion, destroyGame), 1000);
+        if (forcedWaits) {
+            for (const [gameAndPlayer, time] of Object.entries(forcedWaits)) {
+                if (Date.now() / 1000 >= parseInt(time)) {
+                    const [gameId, playerId] = gameAndPlayer.split(':');
+                    console.log(`ending wait for player ${playerId} in game ${gameId}`);
+                    await redisCall('hdel', 'forcedWaits', gameAndPlayer);
+                    await endForcedWait(gameId, playerId);
+                }
+            }
+        }
+
+        setTimeout(runChecksInBackground, 1000);
     }
 
     async function endDiscussion(gameId: string) {
@@ -243,6 +264,38 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
             'votes',
             'results',
        ].map(k => `games:${gameId}:${k}`));
+
+       for (const key of await redisCall<string[]>('hkeys', 'forcedWaits')) {
+           if (key.startsWith(gameId)) {
+               await redisCall('hdel', 'forcedWaits', key);
+           }
+       }
+    }
+
+    async function endForcedWait(gameId: string, playerId: string): Promise<void> {
+        if (canTakeAction(playerId, await getAssignedCards(gameId), await redisCall<string[]>('smembers', `games:${gameId}:completedTurns`))) {
+            await redisCall('srem', `games:${gameId}:waiting`, playerId);
+            await askPlayerForAction(gameId, playerId);
+        }
+    }
+
+    async function askPlayerForAction(gameId: string, playerId: string): Promise<void> {
+        const sock = (openSockets.get(gameId) as Map<string, WebSocket>).get(playerId);
+        sock?.send(JSON.stringify({
+            type: 'stage',
+            stage: 'action',
+        }));
+
+        const revelation = getInitialRevelation(playerId, await getAssignedCards(gameId), await getSwaps(gameId));
+        if (revelation !== undefined) {
+            console.log(`storing revelation "${revelation}" for player ${playerId} in game ${gameId}`);
+
+            await redisCall<number>('rpush', `games:${gameId}:events`, `r:${playerId}:${revelation}`);
+            sock?.send(JSON.stringify({
+                type: 'revelation',
+                revelation,
+            }));
+        }
     }
 
     async function handleIncomingMessage(gameId: string, playerId: string, ws: WebSocket, data: string) {
@@ -333,31 +386,28 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                         const sockets = openSockets.get(gameId) as Map<string, WebSocket>;
 
                         for (const p of await redisCall<string[]>('smembers', `games:${gameId}:playersInGame`)) {
-                            const sock = sockets.get(p);
+                            const sock = sockets.get(p),
+                                card = await redisCall<string>('hget', `games:${gameId}:assignedCards`, p);
 
-                            if (isTurnImmediatelyComplete(await redisCall<string>('hget', `games:${gameId}:assignedCards`, p))) {
+                            if (isTurnImmediatelyComplete(card)) {
                                 await redisCall('sadd', `games:${gameId}:completedTurns`, p);
                                 sock?.send(JSON.stringify({
                                     type: 'stage',
                                     stage: 'wait',
                                 }));
+                            } else if (mayWait(card)) {
+                                // they must wait at least fifteen seconds so they can't learn about
+                                // which cards players have
+                                sock?.send(JSON.stringify({
+                                    type: 'stage',
+                                    stage: 'wait',
+                                }));
+
+                                await redisCall('hset', 'forcedWaits', `${gameId}:${p}`, Math.floor(Date.now() / 1000 + 15).toString());
+                                await redisCall('sadd', `games:${gameId}:waiting`, p);
                             } else {
                                 if (canTakeAction(p, await getAssignedCards(gameId), [])) {
-                                    sock?.send(JSON.stringify({
-                                        type: 'stage',
-                                        stage: 'action',
-                                    }));
-
-                                    const revelation = getInitialRevelation(p, await getAssignedCards(gameId), await getSwaps(gameId));
-
-                                    if (revelation !== undefined) {
-                                        await redisCall<number>('rpush', `games:${gameId}:events`, `r:${p}:${revelation}`);
-
-                                        sock?.send(JSON.stringify({
-                                            type: 'revelation',
-                                            revelation,
-                                        }));
-                                    }
+                                    await askPlayerForAction(gameId, p);
                                 } else {
                                     await redisCall<number>('sadd', `games:${gameId}:waiting`, p);
 
@@ -446,21 +496,11 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                         // see if that allowed new players to take actions
                         for (const p of await redisCall<string[]>('smembers', `games:${gameId}:waiting`)) {
                             if (canTakeAction(p, await getAssignedCards(gameId), await redisCall<string[]>('smembers', `games:${gameId}:completedTurns`))) {
+                                console.log(`allowing ${p} to take action because ${playerId} finished their action`);
                                 await redisCall<number>('srem', `games:${gameId}:waiting`, p);
-                                
-                                const sock = (openSockets.get(gameId) as Map<string, WebSocket>).get(p);
-                                sock?.send(JSON.stringify({
-                                    type: 'stage',
-                                    stage: 'action',
-                                }));
 
-                                const revelation = getInitialRevelation(p, await getAssignedCards(gameId), await getSwaps(gameId));
-                                if (revelation !== undefined) {
-                                    await redisCall<number>('rpush', `games:${gameId}:events`, `r:${p}:${revelation}`);
-                                    sock?.send(JSON.stringify({
-                                        type: 'revelation',
-                                        revelation,
-                                    }));
+                                if (!(await redisCall<number>('hexists', 'forcedWaits', `${gameId}:${p}`))) {
+                                    await askPlayerForAction(gameId, p);
                                 }
                             }
                         }
@@ -596,6 +636,7 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                         if (
                             await redisCall<number>('sismember', `games:${gameId}:waiting`, playerId)
                             || await redisCall<number>('sismember', `games:${gameId}:completedTurns`, playerId)
+                            || await redisCall<number>('hexists', 'forcedWaits', `${gameId}:${playerId}`)
                         ) {
                             ws.send(JSON.stringify({
                                 type: 'stage',
@@ -674,7 +715,7 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
         }
     }
 
-    runChecksInBackground(endDiscussion, destroyGame);
+    runChecksInBackground();
 
     // set expiration timers on all games in case no one connects
     (async () => {

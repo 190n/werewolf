@@ -135,12 +135,14 @@ $cards: (
             margin-bottom: 0;
 
             &.last-minute {
-                color: #600000;
+                color: #600020;
             }
 
             &.last-seconds {
-                color: #c00000;
+                color: #c02000;
             }
+
+            transition: color 0.5s;
         }
 
         .hint {
