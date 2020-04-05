@@ -280,7 +280,7 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
     }
 
     async function askPlayerForAction(gameId: string, playerId: string): Promise<void> {
-        const sock = (openSockets.get(gameId) as Map<string, WebSocket>).get(playerId);
+        const sock = openSockets.get(gameId)?.get(playerId);
         sock?.send(JSON.stringify({
             type: 'stage',
             stage: 'action',
