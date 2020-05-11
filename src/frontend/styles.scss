@@ -164,3 +164,75 @@ $cards: (
         }
     }
 }
+
+.toast {
+    font-family: $font;
+    font-size: 20px;
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    width: calc(min(100vw - 48px, 700px));
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+    margin-left: calc(max(-350px, -50vw + 24px));
+    box-sizing: border-box;
+    background-color: #c8e0ff;
+    padding: 18px 24px;
+    border-radius: 4px;
+    border: thin solid #2080ff;
+    box-shadow: 0 6px 12px #48608080;
+
+    .close {
+        color: #00000080;
+        font-weight: bold;
+        position: absolute;
+        right: 6px;
+        top: 6px;
+        font-size: 24px;
+        height: 12px;
+        line-height: 12px;
+        appearance: none;
+        -webkit-appearance: none;
+        background-color: transparent;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+    }
+
+    details {
+        max-height: 100%;
+
+        p {
+            margin-bottom: 0;
+        }
+
+        summary::-webkit-details-marker {
+            display: none;
+        }
+
+        summary {
+            list-style-type: none;
+            cursor: pointer;
+
+            &:focus {
+                outline: none;
+                ::-moz-focus-inner {
+                    display: none;
+                }
+
+                .read-more {
+                    outline: dotted;
+                    outline-width: 1px;
+                }
+            }
+        }
+
+        &:not([open]) summary .read-more u:after {
+            content: "show more";
+        }
+
+        &[open] summary .read-more u:after {
+            content: "show less";
+        }
+    }
+}

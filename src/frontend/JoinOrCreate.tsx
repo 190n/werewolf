@@ -41,7 +41,6 @@ export default function JoinOrCreate(): JSX.Element {
                     </Link>
                 </p>
             </form>
-            <br /><br />
             <p>
                 Or, <Link to="/create">create a game</Link>
             </p>

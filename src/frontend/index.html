@@ -9,6 +9,28 @@
     </head>
     <body>
         <main id="app"></main>
+        <div class="toast">
+            <button class="close" aria-label="Close ??" onclick="this.parentNode.parentNode.removeChild(this.parentNode)">&times;</button>
+            <details>
+                <summary>
+                    <span class="headline">
+                        Hello, friend! This is a work in progress. There are most likely bugs and quirks
+                        present, not to mention features I haven't gotten around to yet.
+                    </span>
+                    <span class="read-more">(<u></u>)</span>
+                </summary>
+                <p>
+                    If you find something that doesn't look right, let me know! You can check
+                    <a href="https://github.com/190n/werewolf/issues">existing bug reports</a> as
+                    well as <a href="https://github.com/190n/werewolf/projects/1">my roadmap</a>,
+                    and if your issue isn't mentioned, please report it by
+                    <a href="https://github.com/190n/werewolf/issues/new">filing a bug report</a>!
+                </p>
+                <p>
+                    Thanks, and enjoy the game!
+                </p>
+            </details>
+        </div>
         <script src="index.tsx"></script>
     </body>
 </html>
