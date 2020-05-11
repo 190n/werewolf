@@ -6,10 +6,14 @@ import { TurnComponent } from '../Turn';
 const Troublemaker: TurnComponent = observer(({ store: { playersInGame, ownActions, ownId }, onAction }) => {
     const [choice1, setChoice1] = useState(''),
         [choice2, setChoice2] = useState(''),
-        [nextChoice, setNextChoice] = useState(0);
+        [nextChoice, setNextChoice] = useState<0 | 1>(0);
 
     function choose(c: string) {
-        if (choice1 == c || choice2 == c) return;
+        if (choice1 == c) {
+            return setChoice1(c);
+        } else if (choice2 == c) {
+            return setChoice2(c);
+        }
 
         if (nextChoice == 0) {
             setChoice1(c);
@@ -31,7 +35,7 @@ const Troublemaker: TurnComponent = observer(({ store: { playersInGame, ownActio
                         type="checkbox"
                         id={p.id}
                         checked={choice1 == p.id || choice2 == p.id}
-                        onChange={() => choose(p.id)}
+                        onClick={() => choose(p.id)}
                         disabled={ownActions.length > 0}
                     />
                     {p.nick}
