@@ -6,26 +6,28 @@ import Tag from '../Tag';
 
 const Seer: TurnComponent = observer(({ store: { playersInGame, revelations, ownActions, ownId }, onAction }) => {
     const [choice1, setChoice1] = useState(''),
-        [choice2, setChoice2] = useState(''),
-        [nextChoice, setNextChoice] = useState(0);
+        [choice2, setChoice2] = useState('');
 
     function setPlayerChoice(c: string) {
         setChoice1(c);
         setChoice2('');
     }
 
-    function setCenterChoice(i: number) {
-        if (i.toString() == choice1 || i.toString() == choice2) return;
-
+    function setCenterChoice(c: string) {
         if (choice1.length > 1) setChoice1('');
         if (choice2.length > 1) setChoice2('');
 
-        if (nextChoice == 0) {
-            setChoice1(i.toString());
-            setNextChoice(1);
+        if (choice1 == c) {
+            return setChoice1('');
+        } else if (choice2 == c) {
+            return setChoice2('');
+        } else if (choice1 == '') {
+            return setChoice1(c);
+        } else if (choice2 == '') {
+            return setChoice2(c);
         } else {
-            setChoice2(i.toString());
-            setNextChoice(0);
+            setChoice1(c);
+            setChoice2('');
         }
     }
 
@@ -64,7 +66,7 @@ const Seer: TurnComponent = observer(({ store: { playersInGame, revelations, own
                             type="checkbox"
                             id={pos}
                             checked={choice1 == i.toString() || choice2 == i.toString()}
-                            onChange={() => setCenterChoice(i)}
+                            onChange={() => setCenterChoice(i.toString())}
                             disabled={ownActions.length > 0}
                         />
                         {pos}
