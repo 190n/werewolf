@@ -1,6 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { observer } from 'mobx-react';
-import { Set } from 'immutable';
 
 import { StoreProps } from './WerewolfState';
 import useSharedSocket from './use-shared-socket';
@@ -14,6 +13,8 @@ const selectables: { [key: string]: string[] } = {
     'villager 2': ['villager'],
     'villager 3': ['villager'],
 };
+
+const sortedKeys = Object.keys(selectables).sort((a, b) => cards.indexOf(selectables[a][0]) - cards.indexOf(selectables[b][0]));
 
 interface SelectableCardProps {
     name: string;
@@ -37,35 +38,34 @@ const SelectableCard = ({
 
 
 const GameConfiguration = observer(({ store }: StoreProps): JSX.Element => {
-    const sortedKeys = useMemo(() => Object.keys(selectables).sort((a, b) => cards.indexOf(selectables[a][0]) - cards.indexOf(selectables[b][0])), []),
-        [selected, setSelected] = useState(Set<string>()),
+    const [selected, setSelected] = useState<string[]>([]),
         [isConfirming, setIsConfirming] = useState(false),
         [sendMessage] = useSharedSocket(),
         [discussionLengthMinutes, setDiscussionLengthMinutes] = useState('5');
 
     if (store.isLeader) {
-        function sendCards(newCards: Set<string>, final: boolean = false) {
+        function sendCards(newCards: string[], final: boolean = false) {
             sendMessage(JSON.stringify({
                 type: final ? 'confirmCards' : 'cardsInPlay',
-                cardsInPlay: newCards.toArray().map(s => selectables[s]).flat(1),
+                cardsInPlay: newCards.map(s => selectables[s]).flat(1),
                 discussionLength: parseInt(discussionLengthMinutes) * 60,
             }));
         }
 
         function selectAll() {
-            const newCards = Set<string>(sortedKeys);
-            setSelected(newCards);
-            sendCards(newCards);
+            setSelected(sortedKeys);
+            sendCards(sortedKeys);
         }
 
         function selectNone() {
-            const newCards = Set<string>();
-            setSelected(newCards);
-            sendCards(newCards);
+            setSelected([]);
+            sendCards([]);
         }
 
         function onToggle(s: string) {
-            const newCards = selected.has(s) ? selected.delete(s) : selected.add(s);
+            const newCards = selected.includes(s)
+                ? selected.filter(i => i != s)
+                : [...selected, s];
             setSelected(newCards);
             sendCards(newCards);
         }
@@ -81,7 +81,7 @@ const GameConfiguration = observer(({ store }: StoreProps): JSX.Element => {
                         name={s}
                         className={selectables[s][0]}
                         onToggle={isConfirming ? () => {} : onToggle.bind(null, s)}
-                        selected={selected.has(s)}
+                        selected={selected.includes(s)}
                         disabled={isConfirming}
                         key={s}
                     />
