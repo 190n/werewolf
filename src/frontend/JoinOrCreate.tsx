@@ -1,49 +1,62 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
+import { Button, FormControl, FormLabel, Heading, Input, Link, Stack, Text } from '@chakra-ui/core';
 
 export default function JoinOrCreate(): JSX.Element {
     const [joinCode, setJoinCode] = useState(''),
         [nick, setNick] = useState('');
 
     return (
-        <div className="JoinOrCreate">
-            <h1>Werewolf</h1>
+        <Stack spacing={8} p={8} align="center">
+            <Heading>Werewolf</Heading>
             <form>
-                <p>
-                    <label htmlFor="joinCode">
-                        Join code:&nbsp;
-                        <input
-                            id="joinCode"
-                            type="text"
-                            inputMode="numeric"
-                            pattern="[0-9]*"
-                            maxLength={6}
-                            autoFocus={true}
-                            value={joinCode}
-                            onChange={e => setJoinCode(e.target.value)}
-                        />
-                    </label>
-                </p>
-                <p>
-                    <label htmlFor="nick">
-                        Nickname:&nbsp;
-                        <input
-                            id="nick"
-                            type="text"
-                            value={nick}
-                            onChange={e => setNick(e.target.value)}
-                        />
-                    </label>
-                </p>
-                <p>
-                    <Link to={`/${joinCode}?nick=${encodeURIComponent(nick)}`}>
-                        <input type="submit" value="Join Game" disabled={joinCode.length < 6 || nick.length == 0} />
-                    </Link>
-                </p>
+                <FormControl>
+                    <FormLabel htmlFor="joinCode">
+                        Join code
+                    </FormLabel>
+                    <Input
+                        id="joinCode"
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        maxLength={6}
+                        autoFocus={true}
+                        value={joinCode}
+                        onChange={e => setJoinCode(e.target.value)}
+                    />
+                </FormControl>
+                <FormControl mt={4}>
+                    <FormLabel htmlFor="nick">
+                        Nickname
+                    </FormLabel>
+                    <Input
+                        id="nick"
+                        type="text"
+                        value={nick}
+                        onChange={e => setNick(e.target.value)}
+                    />
+                </FormControl>
+                <RouterLink to={`/${joinCode}?nick=${encodeURIComponent(nick)}`}>
+                    <Button
+                        type="submit"
+                        isDisabled={joinCode.length < 6 || nick.length == 0}
+                        variantColor="blue"
+                        mt={4}
+                        w="100%"
+                    >
+                        Join Game
+                    </Button>
+                </RouterLink>
             </form>
-            <p>
-                Or, <Link to="/create">create a game</Link>
-            </p>
-        </div>
+            <Text mt={4}>
+                {'Or, '}
+                {/* https://github.com/emotion-js/emotion/issues/1137 can explain this bullshit */}
+                {React.createElement(Link as React.FC<{ as: typeof RouterLink, to: string, children: React.ReactNode }>, {
+                    as: RouterLink,
+                    to: 'create',
+                    children: ['create a game']
+                })}
+            </Text>
+        </Stack>
     );
 }
