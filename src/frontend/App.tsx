@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
     BrowserRouter as Router,
     Switch,
     Route,
-    Link
 } from 'react-router-dom';
+import { Stack } from '@chakra-ui/core';
 
 import { StoreProps } from './WerewolfState';
 import JoinOrCreate from './JoinOrCreate';
@@ -19,13 +19,17 @@ const App = ({ store }: StoreProps): JSX.Element => (
                 <InGameDispatch store={store} />
             </Route>
             <Route path="/create">
-                <Create />
+                <Stack align="center" p={8}>
+                    <Create />
+                </Stack>
             </Route>
             <Route path="/:gameId">
                 <Join store={store} />
             </Route>
             <Route path="/">
-                <JoinOrCreate />
+                <Stack align="center" p={8}>
+                    <JoinOrCreate />
+                </Stack>
             </Route>
         </Switch>
     </Router>

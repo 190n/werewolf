@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { Button, FormControl, FormLabel, Heading, Input, Stack, Text } from '@chakra-ui/core';
+import { Button, FormControl, FormLabel, Heading, Input, Text } from '@chakra-ui/core';
 
 import Link from './Link';
 
@@ -9,8 +9,8 @@ export default function JoinOrCreate(): JSX.Element {
         [nick, setNick] = useState('');
 
     return (
-        <Stack spacing={8} p={8} align="center">
-            <Heading>Werewolf</Heading>
+        <>
+            <Heading mb={4}>Werewolf</Heading>
             <form>
                 <FormControl>
                     <FormLabel htmlFor="joinCode">
@@ -24,7 +24,7 @@ export default function JoinOrCreate(): JSX.Element {
                         maxLength={6}
                         autoFocus={true}
                         value={joinCode}
-                        onChange={e => setJoinCode(e.target.value)}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setJoinCode(e.target.value)}
                     />
                 </FormControl>
                 <FormControl mt={4}>
@@ -35,7 +35,7 @@ export default function JoinOrCreate(): JSX.Element {
                         id="nick"
                         type="text"
                         value={nick}
-                        onChange={e => setNick(e.target.value)}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNick(e.target.value)}
                     />
                 </FormControl>
                 <RouterLink to={`/${joinCode}?nick=${encodeURIComponent(nick)}`}>
@@ -53,6 +53,6 @@ export default function JoinOrCreate(): JSX.Element {
             <Text mt={4}>
                 Or, <Link to="/create">create a game</Link>
             </Text>
-        </Stack>
+        </>
     );
 }

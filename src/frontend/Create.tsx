@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Redirect, Link } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
+import { Button, FormControl, FormLabel, Heading, Input, Text } from '@chakra-ui/core';
 
+import Link from './Link';
 import { backendBaseUrl } from './config';
 
 export default function Create(): JSX.Element {
@@ -33,34 +35,44 @@ export default function Create(): JSX.Element {
     } else if (didError) {
             return (
                 <>
-                    <p>
+                    <Text>
                         Failed to create game.
-                    </p>
-                    <p>
+                    </Text>
+                    <Text>
                         <Link to="/">Back</Link>
-                    </p>
+                    </Text>
                 </>
             );
     } else if (submitted) {
-        return <p>Creating game...</p>;
+        return <Text>Creating game...</Text>;
     } else {
         return (
-            <div className="Create">
-                <h1>Create game</h1>
-                <p>
-                    <label htmlFor="nick">
-                        Nickname:&nbsp;
-                        <input
+            <>
+                <Heading mb={4}>Create game</Heading>
+                <form>
+                    <FormControl mb={4}>
+                        <FormLabel htmlFor="nick">
+                            Nickname
+                        </FormLabel>
+                        <Input
                             id="nick"
                             type="text"
                             value={nick}
-                            onChange={e => setNick(e.target.value)}
-                            disabled={submitted}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNick(e.target.value)}
+                            isDisabled={submitted}
                         />
-                    </label>
-                </p>
-                <button onClick={() => setSubmitted(true)} disabled={nick.length == 0 || submitted}>Create game</button>
-            </div>
+                    </FormControl>
+                    <Button
+                        onClick={() => setSubmitted(true)}
+                        isDisabled={nick.length == 0 || submitted}
+                        variantColor="blue"
+                        type="submit"
+                        w="100%"
+                    >
+                        Create game
+                    </Button>
+                </form>
+            </>
         );
     }
 }
