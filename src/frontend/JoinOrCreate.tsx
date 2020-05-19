@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { Button, FormControl, FormLabel, Heading, Input, Link, Stack, Text } from '@chakra-ui/core';
+import { Button, FormControl, FormLabel, Heading, Input, Stack, Text } from '@chakra-ui/core';
+
+import Link from './Link';
 
 export default function JoinOrCreate(): JSX.Element {
     const [joinCode, setJoinCode] = useState(''),
@@ -49,13 +51,7 @@ export default function JoinOrCreate(): JSX.Element {
                 </RouterLink>
             </form>
             <Text mt={4}>
-                {'Or, '}
-                {/* https://github.com/emotion-js/emotion/issues/1137 can explain this bullshit */}
-                {React.createElement(Link as React.FC<{ as: typeof RouterLink, to: string, children: React.ReactNode }>, {
-                    as: RouterLink,
-                    to: 'create',
-                    children: ['create a game']
-                })}
+                Or, <Link to="/create">create a game</Link>
             </Text>
         </Stack>
     );
