@@ -9,9 +9,11 @@ interface LinkProps {
 
 // https://github.com/emotion-js/emotion/issues/1137 can explain this bullshit
 const Link: React.FC<LinkProps> = ({ to, children }) => React.createElement(
-    UILink as React.FC<{ as: typeof RouterLink } & LinkProps>,
+    UILink as React.FC<{ as: typeof RouterLink, color: string, textDecoration: string } & LinkProps>,
     {
         as: RouterLink,
+        color: 'blue.700',
+        textDecoration: 'underline',
         to,
         children,
     },
