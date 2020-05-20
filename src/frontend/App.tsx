@@ -29,30 +29,24 @@ const footerLinks: { text: string, url: string }[] = [
 
 const App = ({ store }: StoreProps): JSX.Element => (
     <Flex h="100vh" direction="column">
-        <Box flexGrow={1}>
+        <Stack flexGrow={1} align="center" p={8}>
             <Router>
                 <Switch>
                     <Route path="/:gameId/:playerId/play">
                         <InGameDispatch store={store} />
                     </Route>
                     <Route path="/create">
-                        <Stack align="center" p={8}>
-                            <Create />
-                        </Stack>
+                        <Create />
                     </Route>
                     <Route path="/:gameId">
-                        <Stack align="center" p={8}>
-                            <Join store={store} />
-                        </Stack>
+                        <Join store={store} />
                     </Route>
                     <Route path="/">
-                        <Stack align="center" p={8}>
-                            <JoinOrCreate />
-                        </Stack>
+                        <JoinOrCreate />
                     </Route>
                 </Switch>
             </Router>
-        </Box>
+        </Stack>
         <Box as="footer" pb={4} textAlign="center">
             {footerLinks.map(({ text, url }, i) => (
                 <React.Fragment key={i}>

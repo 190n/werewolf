@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { observer } from 'mobx-react';
 import { ReadyState } from 'react-use-websocket';
+import { Heading, Text } from '@chakra-ui/core';
 
+import Link from './Link';
 import { StoreProps } from './WerewolfState';
 import useSharedSocket from './use-shared-socket';
 
@@ -23,18 +25,18 @@ const Connect = observer(({ store }: StoreProps): JSX.Element => {
     store.ownId = playerId;
 
     return (
-        <div className="Rejoin">
-            <h1>
+        <>
+            <Heading>
                 Joining {gameId}...
-            </h1>
-            <p>
+            </Heading>
+            <Text>
                 {connectionStatus}<br />
                 {endReason && endReason}
-            </p>
-            <p>
+            </Text>
+            <Text>
                 <Link to="/">Back</Link>
-            </p>
-        </div>
+            </Text>
+        </>
     );
 });
 
