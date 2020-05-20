@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Link, Redirect, useParams } from 'react-router-dom';
+import { Redirect, useParams } from 'react-router-dom';
 import { observer } from 'mobx-react';
+import { Box,Button, FormControl, FormLabel, Heading, Input, Text } from '@chakra-ui/core';
 
+import Link from './Link';
 import { StoreProps } from './WerewolfState';
 import { backendBaseUrl } from './config';
 
@@ -9,7 +11,7 @@ const Join = observer(({ store }: StoreProps): JSX.Element => {
     const { gameId } = useParams(),
         [nick, setNick] = useState(new URLSearchParams(location.search).get('nick')),
         [error, setError] = useState<string | undefined>(undefined),
-        [submitted, setSubmitted] = useState(nick != null);
+        [submitted, setSubmitted] = useState(nick !== null);
 
     async function tryJoinGame() {
         if (nick === null || !submitted) {
@@ -30,31 +32,44 @@ const Join = observer(({ store }: StoreProps): JSX.Element => {
 
     return (
         submitted ? (
-            <div className="Join">
-                <h1>Joining {gameId}...</h1>
-                <p>
+            <>
+                <Heading>Joining {gameId}...</Heading>
+                <Text>
                     {error}
-                </p>
-                <p>
+                </Text>
+                <Text>
                     <Link to="/">Back</Link>
-                </p>
+                </Text>
                 {store.ownId && <Redirect to={`/${gameId}/${store.ownId}/play`} />}
-            </div>
+            </>
         ) : (
-            <div className="Join">
-                <h1>Enter your nickname:</h1>
-                <p>
-                    <input
-                        type="text"
-                        value={typeof nick == 'string' ? nick : ''}
-                        onChange={e => setNick(e.target.value)}
-                    />
-                </p>
-                <button onClick={() => setSubmitted(true)}>Join</button>
-                <p>
+            <>
+                <Heading mb={4}>Join game {gameId}</Heading>
+                <form>
+                    <FormControl mb={4}>
+                        <FormLabel htmlFor="nick">
+                            Nickname
+                        </FormLabel>
+                        <Input
+                            id="nick"
+                            type="text"
+                            value={typeof nick == 'string' ? nick : ''}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNick(e.target.value)}
+                        />
+                    </FormControl>
+                    <Button
+                        onClick={() => setSubmitted(true)}
+                        isDisabled={nick == ''}
+                        variantColor="blue"
+                        w="100%"
+                    >
+                        Join
+                    </Button>
+                </form>
+                <Text mt={4} color="red.700">
                     {error}
-                </p>
-            </div>
+                </Text>
+            </>
         )
     );
 });
