@@ -61,6 +61,7 @@ const Join = observer(({ store }: StoreProps): JSX.Element => {
                         onClick={() => setSubmitted(true)}
                         isDisabled={nick == ''}
                         variantColor="blue"
+                        type="submit"
                         w="100%"
                     >
                         Join

@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+
 type ColorMode = 'light' | 'dark';
 type ThemeSetting = ColorMode | 'system';
 

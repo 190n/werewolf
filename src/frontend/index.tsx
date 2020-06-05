@@ -1,3 +1,4 @@
+import 'preact/debug';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { CSSReset, ColorModeProvider, ThemeProvider } from '@chakra-ui/core';

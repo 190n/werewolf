@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { observer } from 'mobx-react';
+import { Button } from '@chakra-ui/core';
 
 import useSharedSocket from './use-shared-socket';
 import { StoreProps } from './WerewolfState';
@@ -81,7 +82,7 @@ const InGameDispatch = observer(({ store }: StoreProps): JSX.Element => {
     return (
         <>
             {mainComponent}
-            <ul>
+            {/* <ul>
                 <li>
                     You are the&nbsp;
                     <span className={`tag ${store.ownCard}`}>{store.ownCard}</span>
@@ -92,9 +93,9 @@ const InGameDispatch = observer(({ store }: StoreProps): JSX.Element => {
                         {value}
                     </li>
                 ))}
-            </ul>
+            </ul> */}
             {store.isLeader && (
-                <button onClick={() => confirm('Are you sure?') && sendMessage(JSON.stringify({ type: 'restart' }))}>Restart game</button>
+                <Button onClick={() => confirm('Are you sure?') && sendMessage(JSON.stringify({ type: 'restart' }))}>Restart game</Button>
             )}
         </>
     );
