@@ -1,6 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import { List, ListItem, Text } from '@chakra-ui/core';
+import { Box, List, ListItem, Text } from '@chakra-ui/core';
 
 import { StoreProps, Player as PlayerType } from './WerewolfState';
 
@@ -11,20 +11,21 @@ export interface PlayerProps {
 
 export function Player({ player: { nick }, isSelf }: PlayerProps): JSX.Element {
     return (
-        <ListItem>
-            <Text fontSize="xl" as="b">{nick}</Text>
+        /* could be shadowed box in two columns */
+        <Box flexBasis="50%" textAlign="center" p={2} border="">
+            <Text fontSize="2xl" as="b">{nick}</Text>
             {isSelf && <Text as="span"> (you)</Text>}
-        </ListItem>
+        </Box>
     );
 }
 
 const PlayerList = observer(({ store }: StoreProps): JSX.Element => {
     return (
-        <List>
+        <Box w="100%" maxWidth="md" d="flex" flexWrap="wrap" my={2}>
             {
                 store.players.map((p, i) => <Player player={p} isSelf={p.id == store.ownId} key={p.id} />)
             }
-        </List>
+        </Box>
     );
 });
 

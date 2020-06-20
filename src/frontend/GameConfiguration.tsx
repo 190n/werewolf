@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react';
+import { BoxProps, ControlBox, Flex, Heading, Text, VisuallyHidden } from '@chakra-ui/core';
 
 import { StoreProps } from './WerewolfState';
 import useSharedSocket from './use-shared-socket';
@@ -18,7 +19,7 @@ const sortedKeys = Object.keys(selectables).sort((a, b) => cards.indexOf(selecta
 
 interface SelectableCardProps {
     name: string;
-    className: string;
+    role: string;
     onToggle?: () => void;
     selected?: boolean;
     disabled?: boolean;
@@ -26,14 +27,29 @@ interface SelectableCardProps {
 
 const SelectableCard = ({
     name,
-    className,
+    role,
     onToggle = () => {},
     selected = false,
     disabled = false
 }: SelectableCardProps): JSX.Element => (
-    <div className={`SelectableCard ${className}${selected ? ' selected' : ''}${disabled ? ' disabled' : ''}`} onClick={onToggle}>
-        {name}
-    </div>
+    <label>
+        {React.createElement(
+            VisuallyHidden as React.FC<BoxProps & { type: string, checked: boolean }>,
+            { as: 'input', type: 'checkbox', checked: selected, onChange: onToggle },
+            null
+        )}
+        <ControlBox
+            border="2px"
+            borderColor={role}
+            p={2}
+            m={1}
+            borderRadius="md"
+            textTransform="capitalize"
+            cursor={disabled ? 'default' : 'pointer'}
+        >
+            {name}
+        </ControlBox>
+    </label>
 );
 
 
@@ -74,18 +90,20 @@ const GameConfiguration = observer(({ store }: StoreProps): JSX.Element => {
             numExpected = store.playerIdsInGame.length + 3;
 
         return (
-            <div className={isConfirming ? 'GameConfiguration confirm' : 'GameConfiguration'}>
-                <h1>{isConfirming ? 'Confirm card selection' : 'Choose cards'}</h1>
-                {sortedKeys.map(s => (
-                    <SelectableCard
-                        name={s}
-                        className={selectables[s][0]}
-                        onToggle={isConfirming ? () => {} : onToggle.bind(null, s)}
-                        selected={selected.includes(s)}
-                        disabled={isConfirming}
-                        key={s}
-                    />
-                ))}
+            <>
+                <Heading mb={4}>{isConfirming ? 'Confirm card selection' : 'Choose cards'}</Heading>
+                <Flex wrap="wrap" w="100%" maxWidth="lg" justifyContent="center">
+                    {sortedKeys.map(s => (
+                        <SelectableCard
+                            name={s}
+                            role={selectables[s][0]}
+                            onToggle={isConfirming ? () => {} : onToggle.bind(null, s)}
+                            selected={selected.includes(s)}
+                            disabled={isConfirming}
+                            key={s}
+                        />
+                    ))}
+                </Flex>
                 <p>
                     {isConfirming ? <span>&nbsp;</span> : (
                         <>
@@ -137,21 +155,23 @@ const GameConfiguration = observer(({ store }: StoreProps): JSX.Element => {
                         to start.`
                     )}
                 </p>
-            </div>
+            </>
         );
     } else {
         return (
             <div className="GameConfiguration">
                 <h1>Leader is choosing cards</h1>
-                {sortedKeys.map(s => (
-                    <SelectableCard
-                        name={s}
-                        className={selectables[s][0]}
-                        selected={store.cardsInPlay.includes(selectables[s][0])}
-                        disabled={true}
-                        key={s}
-                    />
-                ))}
+                <Flex wrap="wrap" w="100%" maxWidth="lg" justifyContent="center">
+                    {sortedKeys.map(s => (
+                        <SelectableCard
+                            name={s}
+                            role={selectables[s][0]}
+                            selected={store.cardsInPlay.includes(selectables[s][0])}
+                            disabled={true}
+                            key={s}
+                        />
+                    ))}
+                </Flex>
             </div>
         );
     }

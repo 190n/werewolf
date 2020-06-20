@@ -95,7 +95,7 @@ const InGameDispatch = observer(({ store }: StoreProps): JSX.Element => {
                 ))}
             </ul> */}
             {store.isLeader && (
-                <Button onClick={() => confirm('Are you sure?') && sendMessage(JSON.stringify({ type: 'restart' }))}>Restart game</Button>
+                <></>//<Button onClick={() => confirm('Are you sure?') && sendMessage(JSON.stringify({ type: 'restart' }))}>Restart game</Button>
             )}
         </>
     );

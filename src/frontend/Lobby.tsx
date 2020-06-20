@@ -61,9 +61,9 @@ const Lobby = observer(({ store }: StoreProps): JSX.Element => {
             <PlayerList store={store} />
             {store.isLeader && (
                 store.players.length >= 4 ? (
-                    <button onClick={goToCardSelection}>
+                    <Button onClick={goToCardSelection} variantColor="blue">
                         Start game with {store.players.length} players
-                    </button>
+                    </Button>
                 ) : (
                     <Text>
                         {store.players.length == 3 ? (
