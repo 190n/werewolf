@@ -21,6 +21,12 @@ const Minion: TurnComponent = observer(({ store: { playersInGame, revelations },
                     The only <Tag card="werewolf" /> is <strong>{werewolves[0].nick}</strong>
                 </p>
             );
+        } else if (werewolves.length == 0) {
+            message = (
+                <p>
+                    There are no <Tag card="werewolf" text="werewolves" />.
+                </p>
+            );
         } else {
             message = (
                 <p>
