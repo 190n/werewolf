@@ -2,8 +2,13 @@ const theme = {
     colors: {
         fg: '#222',
         bg: 'white',
-        primary: '#2c1f70',
-        primaryInvert: 'white',
+        lightText: 'white',
+        darkText: '#222',
+        primary: '#311b92',
+        gray: '#bdbdbd',
+        danger: '#b71c1c',
+        warning: '#fbc02d',
+        link: '#0277bd',
         cards: {
             doppelganger: '#00a0c0',
             werewolf: '#000',
