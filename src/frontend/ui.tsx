@@ -31,6 +31,7 @@ export const Root = styled.div`
     // background-image: linear-gradient(#ddd, #ddd 12.5%, white 12.5%, white);
     background-size: 100% 0.5rem;
     line-height: 1.5rem;
+    padding: 1rem;
 
     h1, h2, h3, h4, h5, h6 {
         font-family: ${props => props.theme.fonts.heading};
@@ -115,7 +116,11 @@ export const ButtonGroup = styled.div<ButtonGroupProps>`
 `;
 
 export const FormControl = styled.div`
-    margin: 0.5rem 0;
+    margin: 0.5rem auto;
+    text-align: left;
+    max-width: 16rem;
+
+
 `;
 
 export const Input = styled.input`
@@ -188,12 +193,14 @@ export const ToggleButton: React.FC<ToggleButtonProps> = props => (
 
 export interface FlexibleContainerProps {
     width: string;
+    center?: boolean;
 }
 
 export const FlexibleContainer = styled.div<FlexibleContainerProps>`
     width: 100%;
     max-width: ${props => props.width};
     margin: auto;
+    ${props => props.center && css`text-align: center;`}
 `;
 
 export interface ExternalLinkProps {
