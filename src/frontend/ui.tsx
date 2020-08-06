@@ -183,7 +183,7 @@ const ToggleButtonBase = styled(Button)<ToggleButtonProps>`
     `}
 `;
 
-export const ToggleButton: React.FC<ToggleButtonProps> = props => (
+export const ToggleButton = (props: ToggleButtonProps): JSX.Element => (
     <label onClick={props.onChange}>
         <VisuallyHidden
             as="input"
@@ -284,7 +284,7 @@ const CheckboxControl = styled.span`
     }
 `;
 
-export const Checkbox: React.FC<React.InputHTMLAttributes<HTMLInputElement>> = props => (
+export const Checkbox = (props: React.InputHTMLAttributes<HTMLInputElement>): JSX.Element => (
     <CheckboxWrapper>
         <VisuallyHidden as="input" type="checkbox" {...props} />
         <CheckboxControlWrapper>
@@ -317,7 +317,7 @@ const RadioControl = styled(CheckboxControl)`
     }
 `;
 
-export const Radio: React.FC<React.InputHTMLAttributes<HTMLInputElement>> = props => (
+export const Radio = (props: React.InputHTMLAttributes<HTMLInputElement>): JSX.Element => (
     <CheckboxWrapper>
         <VisuallyHidden as="input" type="radio" {...props} />
         <CheckboxControlWrapper>

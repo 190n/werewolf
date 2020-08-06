@@ -1,6 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 
+import { Button } from './ui';
 import { StoreProps } from './WerewolfState';
 import PlayerList from './PlayerList';
 import SetNickname from './SetNickname';
@@ -23,7 +24,7 @@ const Lobby = observer(({ store }: StoreProps): JSX.Element => {
     }
 
     return (
-        <div className="Lobby">
+        <>
             <h1>Lobby</h1>
             <p>
                 Join code: {store.gameId}
@@ -34,9 +35,9 @@ const Lobby = observer(({ store }: StoreProps): JSX.Element => {
             <PlayerList store={store} />
             {store.isLeader && (
                 store.players.length >= 4 ? (
-                    <button onClick={goToCardSelection}>
+                    <Button onClick={goToCardSelection}>
                         Start game with {store.players.length} players
-                    </button>
+                    </Button>
                 ) : (
                     <p>
                         {store.players.length == 3 ? (
@@ -48,7 +49,7 @@ const Lobby = observer(({ store }: StoreProps): JSX.Element => {
                 )
             )}
             <SetNickname store={store} />
-        </div>
+        </>
     );
 });
 
