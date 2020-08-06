@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Redirect } from 'react-router-dom';
 
-import { backendBaseUrl } from './config';
 import { Button, FormControl, Input, Link } from './ui';
+import { backendBaseUrl } from './config';
 
 export default function Create(): JSX.Element {
     const [gameId, setGameId] = useState(''),

@@ -6,12 +6,12 @@ import {
 } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 
+import { FlexibleContainer, Root } from './ui';
 import { StoreProps } from './WerewolfState';
 import JoinOrCreate from './JoinOrCreate';
 import Join from './Join';
 import InGameDispatch from './InGameDispatch';
 import Create from './Create';
-import { FlexibleContainer, Root } from './ui';
 import theme from './theme';
 
 const App = ({ store }: StoreProps): JSX.Element => (

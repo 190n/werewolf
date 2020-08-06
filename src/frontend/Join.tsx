@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Redirect, useParams } from 'react-router-dom';
 import { observer } from 'mobx-react';
 
+import { Button, FormControl, Input, Link } from './ui';
 import { StoreProps } from './WerewolfState';
 import { backendBaseUrl } from './config';
-import { Button, FormControl, Input, Link } from './ui';
 
 const Join = observer(({ store }: StoreProps): JSX.Element => {
     const { gameId } = useParams(),
