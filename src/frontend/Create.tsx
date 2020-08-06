@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Redirect, Link } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
 
 import { backendBaseUrl } from './config';
+import { Button, FormControl, Input, Link } from './ui';
 
 export default function Create(): JSX.Element {
     const [gameId, setGameId] = useState(''),
@@ -45,22 +46,21 @@ export default function Create(): JSX.Element {
         return <p>Creating game...</p>;
     } else {
         return (
-            <div className="Create">
+            <>
                 <h1>Create game</h1>
-                <p>
+                <FormControl>
                     <label htmlFor="nick">
-                        Nickname:&nbsp;
-                        <input
-                            id="nick"
-                            type="text"
-                            value={nick}
-                            onChange={e => setNick(e.target.value)}
-                            disabled={submitted}
-                        />
+                        Nickname:
                     </label>
-                </p>
-                <button onClick={() => setSubmitted(true)} disabled={nick.length == 0 || submitted}>Create game</button>
-            </div>
+                    <Input
+                        id="nick"
+                        value={nick}
+                        onChange={e => setNick(e.target.value)}
+                        disabled={submitted}
+                    />
+                </FormControl>
+                <Button onClick={() => setSubmitted(true)} disabled={nick.length == 0 || submitted}>Create game</Button>
+            </>
         );
     }
 }

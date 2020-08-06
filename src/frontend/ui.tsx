@@ -87,6 +87,11 @@ export const Button = styled.button<ButtonProps>`
         background-color: ${props => themeColor(props.theme, props.color!)}
     }
 
+    &:disabled {
+        background-color: ${props => mix(0.75, props.theme.colors.gray, themeColor(props.theme, props.color!))};
+        cursor: not-allowed;
+    }
+
     &::-moz-focus-inner {
         border: 0;
     }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, FlexibleContainer, FormControl, Input, Link } from './ui';
+import { Button, FormControl, Input, Link } from './ui';
 
 export default function JoinOrCreate(): JSX.Element {
     const [joinCode, setJoinCode] = useState(''),
