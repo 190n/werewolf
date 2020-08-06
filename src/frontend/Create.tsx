@@ -46,7 +46,7 @@ export default function Create(): JSX.Element {
         return <p>Creating game...</p>;
     } else {
         return (
-            <>
+            <form>
                 <h1>Create game</h1>
                 <FormControl>
                     <label htmlFor="nick">
@@ -59,8 +59,8 @@ export default function Create(): JSX.Element {
                         disabled={submitted}
                     />
                 </FormControl>
-                <Button onClick={() => setSubmitted(true)} disabled={nick.length == 0 || submitted}>Create game</Button>
-            </>
+                <Button as="input" type="submit" value="Create game" onClick={() => setSubmitted(true)} disabled={nick.length == 0 || submitted} />
+            </form>
         );
     }
 }
