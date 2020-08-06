@@ -97,7 +97,7 @@ export const Button = styled.button<ButtonProps>`
     }
 
     ${props => props.wide && css`
-        width: 100%;
+        width: 16rem;
     `}
 `;
 
@@ -124,8 +124,6 @@ export const FormControl = styled.div`
     margin: 0.5rem auto;
     text-align: left;
     max-width: 16rem;
-
-
 `;
 
 export const Input = styled.input`

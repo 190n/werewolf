@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Link, Redirect, useParams } from 'react-router-dom';
+import { Redirect, useParams } from 'react-router-dom';
 import { observer } from 'mobx-react';
 
 import { StoreProps } from './WerewolfState';
 import { backendBaseUrl } from './config';
+import { Button, FormControl, Input, Link } from './ui';
 
 const Join = observer(({ store }: StoreProps): JSX.Element => {
     const { gameId } = useParams(),
@@ -30,7 +31,7 @@ const Join = observer(({ store }: StoreProps): JSX.Element => {
 
     return (
         submitted ? (
-            <div className="Join">
+            <>
                 <h1>Joining {gameId}...</h1>
                 <p>
                     {error}
@@ -39,22 +40,22 @@ const Join = observer(({ store }: StoreProps): JSX.Element => {
                     <Link to="/">Back</Link>
                 </p>
                 {store.ownId && <Redirect to={`/${gameId}/${store.ownId}/play`} />}
-            </div>
+            </>
         ) : (
-            <div className="Join">
+            <form>
                 <h1>Enter your nickname:</h1>
-                <p>
-                    <input
-                        type="text"
+                <FormControl>
+                    <Input
                         value={typeof nick == 'string' ? nick : ''}
                         onChange={e => setNick(e.target.value)}
+                        autoFocus={true}
                     />
-                </p>
-                <button onClick={() => setSubmitted(true)}>Join</button>
+                </FormControl>
+                <Button as="input" type="submit" value="Join" onClick={() => setSubmitted(true)} wide={true} />
                 <p>
                     {error}
                 </p>
-            </div>
+            </form>
         )
     );
 });
