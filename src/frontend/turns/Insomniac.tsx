@@ -1,8 +1,8 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 
+import { Button, Tag } from '../ui';
 import { TurnComponent } from '../Turn';
-import { Tag } from '../ui';
 
 const Insomniac: TurnComponent = observer(({ store: { revelations, ownActions }, onAction }) => {
     if (revelations.length == 0) {
@@ -16,7 +16,7 @@ const Insomniac: TurnComponent = observer(({ store: { revelations, ownActions },
                     Your final card is {revelations[0] == 'insomniac' && 'still'} the&nbsp;
                     <Tag card={revelations[0]} />.
                 </p>
-                <button onClick={() => onAction('')} disabled={ownActions.length > 0}>OK</button>
+                <Button onClick={() => onAction('')} disabled={ownActions.length > 0}>OK</Button>
             </>
         );
     }
