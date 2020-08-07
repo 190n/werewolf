@@ -1,8 +1,8 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 
+import { Button, Tag } from '../ui';
 import { TurnComponent } from '../Turn';
-import { Tag } from '../ui';
 import { getPlayersFromRevelation } from '../util';
 
 const Mason: TurnComponent = observer(({ store: { playersInGame, revelations }, onAction }) => {
@@ -37,7 +37,7 @@ const Mason: TurnComponent = observer(({ store: { playersInGame, revelations }, 
         return (
             <>
                 {message}
-                <button onClick={() => onAction('')}>OK</button>
+                <Button onClick={() => onAction('')}>OK</Button>
             </>
         );
     }
