@@ -27,8 +27,8 @@ const theme = {
     },
 
     fonts: {
-        body: 'Inter, sans-serif',
-        heading: '"Space Grotesk"',
+        body: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+        heading: '"Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
     },
 };
 
