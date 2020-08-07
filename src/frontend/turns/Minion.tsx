@@ -1,9 +1,9 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 
+import { Button, Tag } from '../ui';
 import { TurnComponent } from '../Turn';
 import { getPlayersFromRevelation } from '../util';
-import { Tag } from '../ui';
 import PlayerNameList from '../PlayerNameList';
 
 const Minion: TurnComponent = observer(({ store: { playersInGame, revelations }, onAction }) => {
@@ -18,7 +18,7 @@ const Minion: TurnComponent = observer(({ store: { playersInGame, revelations },
         if (werewolves.length == 1) {
             message = (
                 <p>
-                    The only <Tag card="werewolf" /> is <strong>{werewolves[0].nick}</strong>
+                    The only <Tag card="werewolf" /> is <strong>{werewolves[0].nick}</strong>.
                 </p>
             );
         } else if (werewolves.length == 0) {
@@ -38,7 +38,7 @@ const Minion: TurnComponent = observer(({ store: { playersInGame, revelations },
         return (
             <>
                 {message}
-                <button onClick={() => onAction('')}>OK</button>
+                <Button onClick={() => onAction('')}>OK</Button>
             </>
         );
     }
