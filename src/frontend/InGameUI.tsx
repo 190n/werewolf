@@ -7,9 +7,9 @@ import { StoreProps } from './WerewolfState';
 import useSharedSocket from './use-shared-socket';
 
 const FloatingContainer = styled.div`
-    position: absolute;
+    position: fixed;
     right: 0.5rem;
-    bottom: 0.5rem;
+    bottom: 0.25rem;
     text-align: right;
 `;
 

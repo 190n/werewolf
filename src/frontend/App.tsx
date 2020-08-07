@@ -17,7 +17,7 @@ import theme from './theme';
 const App = ({ store }: StoreProps): JSX.Element => (
     <ThemeProvider theme={theme}>
         <Root>
-            <FlexibleContainer width="800px" center={true}>
+            <FlexibleContainer width="1000px" center={true}>
                 <Router>
                     <Switch>
                         <Route path="/:gameId/:playerId/play">
