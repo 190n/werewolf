@@ -4,7 +4,6 @@ import { observer } from 'mobx-react';
 import { Button } from './ui';
 import { StoreProps } from './WerewolfState';
 import PlayerList from './PlayerList';
-import SetNickname from './SetNickname';
 import useSharedSocket from './use-shared-socket';
 import { frontendBaseUrl } from './config';
 
@@ -48,7 +47,6 @@ const Lobby = observer(({ store }: StoreProps): JSX.Element => {
                     </p>
                 )
             )}
-            <SetNickname store={store} />
         </>
     );
 });

@@ -107,16 +107,17 @@ Button.defaultProps = {
 
 export interface ButtonGroupProps {
     wrap?: boolean;
+    inline?: boolean;
 }
 
 export const ButtonGroup = styled.div<ButtonGroupProps>`
-    display: flex;
+    display: ${props => props.inline ? 'inline-flex' : 'flex'};
     align-items: center;
     flex-wrap: ${props => props.wrap ? 'wrap' : 'nowrap'};
-    margin: 0.75rem -0.25rem;;
+    margin: ${props => props.inline ? '0 -0.25rem' : '0.75rem -0.25rem'};
 
-    ${Button} {
-        margin: 0.25rem;
+    * {
+        margin: ${props => props.inline ? '0 0.25rem' : '0.25rem'};
     }
 `;
 
@@ -126,10 +127,13 @@ export const FormControl = styled.div`
     max-width: 16rem;
 `;
 
-export const Input = styled.input`
+export interface InputProps {
+    inline?: boolean;
+}
+
+export const Input = styled.input<InputProps>`
     box-sizing: border-box;
-    display: block;
-    margin: 0.25rem 0 0 0;
+    display: ${props => props.inline ? 'inline' : 'block'};
     background-color: ${props => props.theme.colors.bg};
     border: 0.125rem solid ${props => props.theme.colors.primary};
     border-radius: 0.25rem;
@@ -139,6 +143,7 @@ export const Input = styled.input`
     padding: 0 0.5rem;
     transition: 100ms box-shadow;
     width: 100%;
+    max-width: 16rem;
 
     &:focus {
         box-shadow: 0 0 0 0.1875rem ${props => transparentize(0.5, props.theme.colors.primary)};
@@ -215,7 +220,7 @@ export const ExternalLink = styled.a.attrs<ExternalLinkProps>(props => props.ope
     text-decoration: underline;
 ` as StyledComponent<'a', any, ExternalLinkProps, never>;
 
-export const Link = styled(ExternalLink).attrs({ as: RouterLink, target: '', rel: '' })`` as StyledComponent<typeof RouterLink, any, RouterLinkProps, never>;
+export const Link = styled(ExternalLink).attrs({ as: RouterLink, target: '', rel: '' })`` as unknown as StyledComponent<typeof RouterLink, any, RouterLinkProps, never>;
 
 const CheckboxWrapper = styled.label`
     user-select: none;

@@ -13,6 +13,7 @@ import Turn from './Turn';
 import Vote from './Vote';
 import Results from './Results';
 import Discussion from './Discussion';
+import InGameUI from './InGameUI';
 
 const InGameDispatch = observer(({ store }: StoreProps): JSX.Element => {
     useEffect(() => {
@@ -94,14 +95,7 @@ const InGameDispatch = observer(({ store }: StoreProps): JSX.Element => {
                     </li>
                 ))}
             </ul>)}
-            {store.isLeader && (
-                <Button
-                    onClick={() => confirm('Are you sure?') && sendMessage(JSON.stringify({ type: 'restart' }))}
-                    color="danger"
-                >
-                    Restart game
-                </Button>
-            )}
+            <InGameUI store={store} />
         </>
     );
 });
