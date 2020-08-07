@@ -8,6 +8,7 @@ const theme = {
         gray: '#bdbdbd',
         danger: '#b71c1c',
         warning: '#fbc02d',
+        lastSeconds: '#e65100',
         link: '#0277bd',
         cards: {
             doppelganger: '#00a0c0',

@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { observer } from 'mobx-react';
+import styled from 'styled-components';
 
 import { StoreProps } from './WerewolfState';
+
+const Countdown = styled.h1<{ totalSeconds: number }>`
+    h1& {
+        font-size: 8rem;
+        line-height: 8rem;
+        font-feature-settings: "tnum";
+        transition: 1s color;
+        color: ${props => props.totalSeconds < 10 ? props.theme.colors.lastSeconds : (props.totalSeconds < 60 ? props.theme.colors.danger : props.theme.colors.fg)};
+    }
+`;
 
 const Discussion = observer(({ store }: StoreProps): JSX.Element => {
     const [totalSeconds, setTotalSeconds] = useState(0);
@@ -21,14 +32,14 @@ const Discussion = observer(({ store }: StoreProps): JSX.Element => {
 
     return (
         <div className="Discussion">
-            <h1 className={totalSeconds < 60 ? (totalSeconds < 10 ? 'countdown last-seconds' : 'countdown last-minute') : 'countdown'}>
+            <Countdown totalSeconds={totalSeconds}>
                 {minutes}
                 :
                 {seconds}
-            </h1>
-            <p className="hint">
+            </Countdown>
+            <h3>
                 Discuss what happened during the night!
-            </p>
+            </h3>
         </div>
     );
 });
