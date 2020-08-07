@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react';
 
+import { Button, ButtonGroup, Tag, ToggleButton } from '../ui';
 import { TurnComponent } from '../Turn';
-import { Tag } from '../ui';
 
 const Drunk: TurnComponent = observer(({ store: { ownActions, revelations }, onAction }) => {
     const [choice, setChoice] = useState(-1);
@@ -13,24 +13,23 @@ const Drunk: TurnComponent = observer(({ store: { ownActions, revelations }, onA
                 <p>
                     Choose a card from the center to switch with your own:
                 </p>
-                <p>
+                <ButtonGroup align="center">
                     {['Left', 'Middle', 'Right'].map((pos, i) => (
-                        <label htmlFor={pos} key={i}>
-                            <input
-                                type="radio"
-                                id={pos}
-                                name="cardFromCenter"
-                                checked={choice == i}
-                                onChange={() => setChoice(i)}
-                                disabled={ownActions.length > 0}
-                            />
+                        <ToggleButton
+                            checked={choice == i}
+                            onChange={() => setChoice(i)}
+                            disabled={ownActions.length > 0}
+                        >
                             {pos}
-                        </label>
+                        </ToggleButton>
                     ))}
-                </p>
-                <p>
-                    <button onClick={() => onAction(choice.toString())} disabled={choice == -1 || ownActions.length > 0}>OK</button>
-                </p>
+                </ButtonGroup>
+                <Button
+                    onClick={() => onAction(choice.toString())}
+                    disabled={choice == -1 || ownActions.length > 0}
+                >
+                    OK
+                </Button>
             </>
         );
     } else {
@@ -41,7 +40,7 @@ const Drunk: TurnComponent = observer(({ store: { ownActions, revelations }, onA
                     &nbsp;card in the center was the <Tag card={revelations[0]} />. You now have that
                     card, and the <Tag card="drunk" /> card is in the center.
                 </p>
-                <button onClick={() => onAction('')} disabled={ownActions.length > 1}>OK</button>
+                <Button onClick={() => onAction('')} disabled={ownActions.length > 1}>OK</Button>
             </>
         );
     }
