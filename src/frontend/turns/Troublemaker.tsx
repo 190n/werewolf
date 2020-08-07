@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react';
 
+import { Button, ButtonGroup, ToggleButton } from '../ui';
 import { TurnComponent } from '../Turn';
 
 const Troublemaker: TurnComponent = observer(({ store: { playersInGame, ownActions, ownId }, onAction }) => {
@@ -27,27 +28,24 @@ const Troublemaker: TurnComponent = observer(({ store: { playersInGame, ownActio
             <p>
                 Choose two other players' cards to switch:
             </p>
-            {playersInGame.filter(p => p.id != ownId).map(p => (
-                <label htmlFor={p.id} key={p.id}>
-                    <input
-                        type="checkbox"
-                        id={p.id}
+            <ButtonGroup wrap align="center">
+                {playersInGame.filter(p => p.id != ownId).map(p => (
+                    <ToggleButton
+                        key={p.id}
                         checked={choice1 == p.id || choice2 == p.id}
-                        onClick={() => choose(p.id)}
+                        onChange={() => choose(p.id)}
                         disabled={ownActions.length > 0}
-                    />
-                    {p.nick}
-                    <br />
-                </label>
-            ))}
-            <p>
-                <button
-                    onClick={() => onAction(`${choice1},${choice2}`)}
-                    disabled={ownActions.length > 0 || choice1 == '' || choice2 == ''}
-                >
-                    OK
-                </button>
-            </p>
+                    >
+                        {p.nick}
+                    </ToggleButton>
+                ))}
+            </ButtonGroup>
+            <Button
+                onClick={() => onAction(`${choice1},${choice2}`)}
+                disabled={ownActions.length > 0 || choice1 == '' || choice2 == ''}
+            >
+                OK
+            </Button>
         </>
     );
 });
