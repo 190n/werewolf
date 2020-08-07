@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react';
 
+import { Button, ButtonGroup, Tag, ToggleButton, ToggleButtonCapitalized } from '../ui';
 import { TurnComponent } from '../Turn';
-import { Tag } from '../ui';
 
 const Seer: TurnComponent = observer(({ store: { playersInGame, revelations, ownActions, ownId }, onAction }) => {
     const [choice1, setChoice1] = useState(''),
@@ -45,45 +45,40 @@ const Seer: TurnComponent = observer(({ store: { playersInGame, revelations, own
                 <p>
                     Choose one other player's card, or two cards in the center, to look at:
                 </p>
-                {playersInGame.filter(p => p.id != ownId).map(p => (
-                    <label htmlFor={p.id} key={p.id}>
-                        <input
-                            type="radio"
-                            id={p.id}
-                            name="playersCard"
+                <ButtonGroup wrap align="center">
+                    {playersInGame.filter(p => p.id != ownId).map(p => (
+                        <ToggleButton
+                            key={p.id}
                             checked={choice1 == p.id}
                             onChange={() => setPlayerChoice(p.id)}
                             disabled={ownActions.length > 0}
-                        />
-                        {p.nick}
-                        <br />
-                    </label>
-                ))}
-                <p />
-                {['Left', 'Middle', 'Right'].map((pos, i) => (
-                    <label htmlFor={pos} key={i}>
-                        <input
-                            type="checkbox"
-                            id={pos}
+                        >
+                            {p.nick}
+                        </ToggleButton>
+                    ))}
+                </ButtonGroup>
+                <ButtonGroup align="center">
+                    {['Left', 'Middle', 'Right'].map((pos, i) => (
+                        <ToggleButton
+                            key={pos}
                             checked={choice1 == i.toString() || choice2 == i.toString()}
                             onChange={() => setCenterChoice(i.toString())}
                             disabled={ownActions.length > 0}
-                        />
-                        {pos}
-                        <br />
-                    </label>
-                ))}
-                <p>
-                    <button
-                        onClick={submitChoices}
-                        disabled={
-                            (choice1.length > 1 ? false : (choice1.length == 0 || choice2.length == 0))
-                            || ownActions.length > 0
-                        }
-                    >
-                        OK
-                    </button>
-                </p>
+                            color="gray"
+                        >
+                            {pos}
+                        </ToggleButton>
+                    ))}
+                </ButtonGroup>
+                <Button
+                    onClick={submitChoices}
+                    disabled={
+                        (choice1.length > 1 ? false : (choice1.length == 0 || choice2.length == 0))
+                        || ownActions.length > 0
+                    }
+                >
+                    OK
+                </Button>
             </>
         );
     } else {
@@ -112,7 +107,7 @@ const Seer: TurnComponent = observer(({ store: { playersInGame, revelations, own
         return (
             <>
                 {message}
-                <button onClick={() => onAction('')} disabled={ownActions.length > 1}>OK</button>
+                <Button onClick={() => onAction('')} disabled={ownActions.length > 1}>OK</Button>
             </>
         );
     }

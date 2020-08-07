@@ -6,7 +6,7 @@ import { TurnComponent } from '../Turn';
 import { getPlayersFromRevelation } from '../util';
 import PlayerNameList from '../PlayerNameList';
 
-const Minion: TurnComponent = observer(({ store: { playersInGame, revelations }, onAction }) => {
+const Minion: TurnComponent = observer(({ store: { playersInGame, revelations, ownActions }, onAction }) => {
     if (revelations.length == 0) {
         return (
             <p>Waiting for server...</p>
@@ -38,7 +38,7 @@ const Minion: TurnComponent = observer(({ store: { playersInGame, revelations },
         return (
             <>
                 {message}
-                <Button onClick={() => onAction('')}>OK</Button>
+                <Button onClick={() => onAction('')} disabled={ownActions.length > 0}>OK</Button>
             </>
         );
     }

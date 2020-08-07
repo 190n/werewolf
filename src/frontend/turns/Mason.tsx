@@ -5,7 +5,7 @@ import { Button, Tag } from '../ui';
 import { TurnComponent } from '../Turn';
 import { getPlayersFromRevelation } from '../util';
 
-const Mason: TurnComponent = observer(({ store: { playersInGame, revelations }, onAction }) => {
+const Mason: TurnComponent = observer(({ store: { playersInGame, revelations, ownActions }, onAction }) => {
     if (revelations.length == 0) {
         return (
             <p>Waiting for server...</p>
@@ -37,7 +37,7 @@ const Mason: TurnComponent = observer(({ store: { playersInGame, revelations }, 
         return (
             <>
                 {message}
-                <Button onClick={() => onAction('')}>OK</Button>
+                <Button onClick={() => onAction('')} disabled={ownActions.length > 0}>OK</Button>
             </>
         );
     }

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react';
 
-import { Button, ButtonGroup, Tag, ToggleButtonCapitalized } from '../ui';
+import { Button, ButtonGroup, Tag, ToggleButton } from '../ui';
 import { TurnComponent } from '../Turn';
 import { getPlayersFromRevelation } from '../util';
 import PlayerNameList from '../PlayerNameList';
 
-const Werewolf: TurnComponent = observer(({ store: { playersInGame, revelations }, onAction }) => {
+const Werewolf: TurnComponent = observer(({ store: { playersInGame, revelations, ownActions }, onAction }) => {
     const [selectedCard, setSelectedCard] = useState(-1);
 
     if (revelations.length == 0) {
@@ -38,7 +38,7 @@ const Werewolf: TurnComponent = observer(({ store: { playersInGame, revelations 
             return (
                 <>
                     {message}
-                    <Button onClick={() => onAction('')}>OK</Button>
+                    <Button onClick={() => onAction('')} disabled={ownActions.length > 0}>OK</Button>
                 </>
             );
         } else {
@@ -48,16 +48,20 @@ const Werewolf: TurnComponent = observer(({ store: { playersInGame, revelations 
                         You are the only <Tag card="werewolf" />. Choose a card from the center to look at:
                     </p>
                     <ButtonGroup align="center">
-                        {['left', 'middle', 'right'].map((c, i) => (
-                            <ToggleButtonCapitalized
+                        {['Left', 'Middle', 'Right'].map((pos, i) => (
+                            <ToggleButton
                                 checked={selectedCard == i}
                                 onChange={() => setSelectedCard(i)}
+                                disabled={ownActions.length > 0}
                             >
-                                {c}
-                            </ToggleButtonCapitalized>
+                                {pos}
+                            </ToggleButton>
                         ))}
                     </ButtonGroup>
-                    <Button disabled={selectedCard == -1} onClick={() => (selectedCard != -1 && onAction(selectedCard.toString()))}>
+                    <Button
+                        disabled={selectedCard == -1 || ownActions.length > 0}
+                        onClick={() => (selectedCard != -1 && onAction(selectedCard.toString()))}
+                    >
                         OK
                     </Button>
                 </>
@@ -70,7 +74,7 @@ const Werewolf: TurnComponent = observer(({ store: { playersInGame, revelations 
                 <p>
                     That card was the <Tag card={revelations[1]} />.
                 </p>
-                <Button onClick={() => onAction('')}>OK</Button>
+                <Button disabled={ownActions.length > 1} onClick={() => onAction('')}>OK</Button>
             </>
         );
     }
