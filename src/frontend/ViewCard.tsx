@@ -1,8 +1,19 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react';
+import styled from 'styled-components';
+import { mix } from 'polished';
 
+import { Button } from './ui';
 import { StoreProps } from './WerewolfState';
 import useSharedSocket from './use-shared-socket';
+
+const CardReveal = styled.h1<{ card: string }>`
+    color: ${props => mix(0.25, '#000000', props.theme.colors.cards[props.card])};
+
+    span {
+        text-transform: capitalize;
+    }
+`;
 
 const ViewCard = observer(({ store }: StoreProps): JSX.Element => {
     const [hasConfirmed, setHasConfirmed] = useState(false);
@@ -21,14 +32,15 @@ const ViewCard = observer(({ store }: StoreProps): JSX.Element => {
                 <p>Waiting to be assigned a card...</p>
             ) : (
                 <>
-                    <h1 className={`card-reveal ${store.ownCard}`}>
+                    <CardReveal card={store.ownCard}>
                         You are the&nbsp;
-                        <span className="card-name">{store.ownCard}</span>
-                    </h1>
+                        <span>{store.ownCard}</span>
+                    </CardReveal>
+                    <br />
                     {hasConfirmed ? (
                         'Waiting for other players to confirm...'
                     ) : (
-                        <button onClick={confirm}>OK</button>
+                        <Button onClick={confirm} big color={`cards.${store.ownCard}`}>OK</Button>
                     )}
                 </>
             )}
