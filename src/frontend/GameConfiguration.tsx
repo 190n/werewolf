@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { observer } from 'mobx-react';
 import styled from 'styled-components';
 
@@ -40,10 +40,36 @@ const FadingButtonGroup = styled(ButtonGroup)<ButtonGroupProps & { fade: boolean
 `;
 
 const GameConfiguration = observer(({ store }: StoreProps): JSX.Element => {
-    const [selected, setSelected] = useState<string[]>([]),
+    let cardsFromLocalStorage: string[] = [];
+
+    if (window.localStorage.getItem('lastSelectedCards') !== null) {
+        const parsed = JSON.parse(window.localStorage.getItem('lastSelectedCards') as string);
+        if (parsed instanceof Array) {
+            cardsFromLocalStorage = parsed.filter(c => selectables.hasOwnProperty(c));
+        }
+    }
+
+    const [selected, setSelected] = useState<string[]>(cardsFromLocalStorage),
         [isConfirming, setIsConfirming] = useState(false),
         [sendMessage] = useSharedSocket(),
-        [discussionLengthMinutes, setDiscussionLengthMinutes] = useState('5');
+        [discussionLengthMinutes, setDiscussionLengthMinutes] = useState(window.localStorage.getItem('lastDiscussionLength') ?? '5');
+
+    useEffect(() => {
+        window.localStorage.setItem('lastSelectedCards', JSON.stringify(selected));
+    }, [selected]);
+
+    useEffect(() => {
+        window.localStorage.setItem('lastDiscussionLength', discussionLengthMinutes);
+    }, [discussionLengthMinutes]);
+
+    useEffect(() => {
+        if (store.isLeader) {
+            sendMessage(JSON.stringify({
+                type: 'cardsInPlay',
+                cardsInPlay: selected.map(s => selectables[s]).flat(1),
+            }));
+        }
+    }, []);
 
     if (store.isLeader) {
         function sendCards(newCards: string[], final: boolean = false) {
