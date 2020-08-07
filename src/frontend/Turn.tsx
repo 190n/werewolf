@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { observer } from 'mobx-react';
 
 import WerewolfState, { StoreProps } from './WerewolfState';
@@ -14,7 +14,6 @@ import useSharedSocket from './use-shared-socket';
 
 const Turn = observer(({ store }: StoreProps): JSX.Element => {
     const [sendMessage] = useSharedSocket();
-    const [action, setAction] = useState('');
 
     function onAction(action: string) {
         sendMessage(JSON.stringify({

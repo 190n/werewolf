@@ -24,7 +24,7 @@ const Connect = observer(({ store }: StoreProps): JSX.Element => {
     store.ownId = playerId;
 
     return (
-        <div className="Rejoin">
+        <>
             <h1>
                 Joining {gameId}...
             </h1>
@@ -35,7 +35,7 @@ const Connect = observer(({ store }: StoreProps): JSX.Element => {
             <p>
                 <Link to="/">Back</Link>
             </p>
-        </div>
+        </>
     );
 });
 

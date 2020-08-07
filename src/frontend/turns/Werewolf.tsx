@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react';
 
+import { Button, ButtonGroup, Tag, ToggleButtonCapitalized } from '../ui';
 import { TurnComponent } from '../Turn';
-import Tag from '../Tag';
 import { getPlayersFromRevelation } from '../util';
 import PlayerNameList from '../PlayerNameList';
 
@@ -24,13 +24,13 @@ const Werewolf: TurnComponent = observer(({ store: { playersInGame, revelations 
             if (otherWerewolves.length == 1) {
                 message = (
                     <p>
-                        The other <Tag card="werewolf" /> is <strong>{otherWerewolves[0].nick}</strong>
+                        The other <Tag card="werewolf" /> is <strong>{otherWerewolves[0].nick}</strong>.
                     </p>
                 );
             } else {
                 message = (
                     <p>
-                        The other <Tag card="werewolf" text="werewolves" /> are <PlayerNameList players={otherWerewolves} />.
+                        The other <Tag card="werewolf">werewolves</Tag> are <PlayerNameList players={otherWerewolves} />.
                     </p>
                 );
             }
@@ -38,7 +38,7 @@ const Werewolf: TurnComponent = observer(({ store: { playersInGame, revelations 
             return (
                 <>
                     {message}
-                    <button onClick={() => onAction('')}>OK</button>
+                    <Button onClick={() => onAction('')}>OK</Button>
                 </>
             );
         } else {
@@ -47,24 +47,19 @@ const Werewolf: TurnComponent = observer(({ store: { playersInGame, revelations 
                     <p>
                         You are the only <Tag card="werewolf" />. Choose a card from the center to look at:
                     </p>
-                    <p>
+                    <ButtonGroup align="center">
                         {['left', 'middle', 'right'].map((c, i) => (
-                            <label htmlFor={c} key={c}>
-                                <input
-                                    type="radio"
-                                    name="cardFromCenter"
-                                    value={i}
-                                    id={c}
-                                    checked={selectedCard == i}
-                                    onChange={() => setSelectedCard(i)}
-                                />
+                            <ToggleButtonCapitalized
+                                checked={selectedCard == i}
+                                onChange={() => setSelectedCard(i)}
+                            >
                                 {c}
-                            </label>
+                            </ToggleButtonCapitalized>
                         ))}
-                    </p>
-                    <button disabled={selectedCard == -1} onClick={() => (selectedCard != -1 && onAction(selectedCard.toString()))}>
+                    </ButtonGroup>
+                    <Button disabled={selectedCard == -1} onClick={() => (selectedCard != -1 && onAction(selectedCard.toString()))}>
                         OK
-                    </button>
+                    </Button>
                 </>
             );
         }
@@ -75,7 +70,7 @@ const Werewolf: TurnComponent = observer(({ store: { playersInGame, revelations 
                 <p>
                     That card was the <Tag card={revelations[1]} />.
                 </p>
-                <button onClick={() => onAction('')}>OK</button>
+                <Button onClick={() => onAction('')}>OK</Button>
             </>
         );
     }

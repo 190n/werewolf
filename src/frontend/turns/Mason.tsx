@@ -2,7 +2,7 @@ import React from 'react';
 import { observer } from 'mobx-react';
 
 import { TurnComponent } from '../Turn';
-import Tag from '../Tag';
+import { Tag } from '../ui';
 import { getPlayersFromRevelation } from '../util';
 
 const Mason: TurnComponent = observer(({ store: { playersInGame, revelations }, onAction }) => {
@@ -27,7 +27,7 @@ const Mason: TurnComponent = observer(({ store: { playersInGame, revelations }, 
         } else {
             message = (
                 <p>
-                    The other <Tag card="mason" text="masons" /> are&nbsp;
+                    The other <Tag card="mason">masons</Tag> are&nbsp;
                     <strong>{otherMasons[0].nick}</strong> and&nbsp;
                     <strong>{otherMasons[1].nick}</strong>.
                 </p>

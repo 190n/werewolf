@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { observer } from 'mobx-react';
 import styled from 'styled-components';
 
-import { Button, ButtonGroup, Input, ToggleButton, ButtonGroupProps } from './ui';
+import { Button, ButtonGroup, Input, ToggleButtonCapitalized, ButtonGroupProps } from './ui';
 import { StoreProps } from './WerewolfState';
 import useSharedSocket from './use-shared-socket';
 import { cards } from '../lib/cards';
@@ -27,10 +27,6 @@ function isSelected(cardsInPlay: string[], s: string): boolean {
         return cardsInPlay.includes(selectables[s][0]);
     }
 }
-
-const ToggleButtonCapitalized = styled(ToggleButton)`
-    text-transform: capitalize;
-`;
 
 const FadingButtonGroup = styled(ButtonGroup)<ButtonGroupProps & { fade: boolean }>`
     input:not(:checked) + ${Button} {

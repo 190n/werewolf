@@ -3,7 +3,7 @@ import { observer } from 'mobx-react';
 
 import { TurnComponent } from '../Turn';
 import { getPlayersFromRevelation } from '../util';
-import Tag from '../Tag';
+import { Tag } from '../ui';
 import PlayerNameList from '../PlayerNameList';
 
 const Minion: TurnComponent = observer(({ store: { playersInGame, revelations }, onAction }) => {
@@ -24,13 +24,13 @@ const Minion: TurnComponent = observer(({ store: { playersInGame, revelations },
         } else if (werewolves.length == 0) {
             message = (
                 <p>
-                    There are no <Tag card="werewolf" text="werewolves" />.
+                    There are no <Tag card="werewolf">werewolves</Tag>.
                 </p>
             );
         } else {
             message = (
                 <p>
-                    The <Tag card="werewolf" text="werewolves" /> are <PlayerNameList players={werewolves} />.
+                    The <Tag card="werewolf">werewolves</Tag> are <PlayerNameList players={werewolves} />.
                 </p>
             );
         }

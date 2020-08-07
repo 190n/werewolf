@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { observer } from 'mobx-react';
 
 import { TurnComponent } from '../Turn';
-import Tag from '../Tag';
+import { Tag } from '../ui';
 
 const Drunk: TurnComponent = observer(({ store: { ownActions, revelations }, onAction }) => {
     const [choice, setChoice] = useState(-1);

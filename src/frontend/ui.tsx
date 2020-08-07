@@ -218,6 +218,10 @@ export const ToggleButton = (props: ToggleButtonProps & React.ButtonHTMLAttribut
     </label>
 );
 
+export const ToggleButtonCapitalized = styled(ToggleButton)`
+    text-transform: capitalize;
+`;
+
 export interface FlexibleContainerProps {
     width: string;
     center?: boolean;
@@ -352,3 +356,19 @@ export const Radio = (props: React.InputHTMLAttributes<HTMLInputElement>): JSX.E
         </span>
     </CheckboxWrapper>
 );
+
+export interface TagProps {
+    card: string;
+    children?: React.ReactNode;
+}
+
+export const Tag = styled.span<TagProps>`
+    ${props => props.children === undefined && css`&::after { content: "${props.card}"; }`}
+    color: ${props => themeInvert(props.theme, `cards.${props.card}`)};
+    padding: 0.125rem 0.375rem;
+    border-radius: 1rem;
+    font-weight: bold;
+    text-transform: capitalize;
+    background-color: ${props => themeColor(props.theme, `cards.${props.card}`)};
+    user-select: none;
+`;

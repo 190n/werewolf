@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { observer } from 'mobx-react';
 
 import { TurnComponent } from '../Turn';
-import Tag from '../Tag';
+import { Tag } from '../ui';
 
 const Seer: TurnComponent = observer(({ store: { playersInGame, revelations, ownActions, ownId }, onAction }) => {
     const [choice1, setChoice1] = useState(''),

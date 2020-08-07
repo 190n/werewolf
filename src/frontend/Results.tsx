@@ -2,7 +2,7 @@ import React from 'react';
 import { observer } from 'mobx-react';
 
 import { StoreProps, Player } from './WerewolfState';
-import Tag from './Tag';
+import { Tag } from './ui';
 import PlayerNameList from './PlayerNameList';
 
 const Results = observer(({ store: { results, ownId, playersInGame } }: StoreProps) => {
@@ -13,7 +13,7 @@ const Results = observer(({ store: { results, ownId, playersInGame } }: StorePro
     } else {
         const winningTeamDisplay = {
             werewolves: (
-                <>The <Tag card="werewolf" text="werewolves" /></>
+                <>The <Tag card="werewolf">werewolves</Tag></>
             ),
             tanner: (
                 <>The <Tag card="tanner" /></>

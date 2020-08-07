@@ -2,7 +2,7 @@ import React from 'react';
 import { observer } from 'mobx-react';
 
 import { TurnComponent } from '../Turn';
-import Tag from '../Tag';
+import { Tag } from '../ui';
 
 const Insomniac: TurnComponent = observer(({ store: { revelations, ownActions }, onAction }) => {
     if (revelations.length == 0) {
