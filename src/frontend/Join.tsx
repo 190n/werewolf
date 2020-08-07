@@ -48,10 +48,10 @@ const Join = observer(({ store }: StoreProps): JSX.Element => {
                     <Input
                         value={typeof nick == 'string' ? nick : ''}
                         onChange={e => setNick(e.target.value)}
-                        autoFocus={true}
+                        autoFocus
                     />
                 </FormControl>
-                <Button as="input" type="submit" value="Join" onClick={() => setSubmitted(true)} wide={true} />
+                <Button as="input" type="submit" value="Join" onClick={() => setSubmitted(true)} wide />
                 <p>
                     {error}
                 </p>

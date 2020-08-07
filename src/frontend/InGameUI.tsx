@@ -59,7 +59,7 @@ const InGameUI = observer(({ store }: StoreProps): JSX.Element => {
                             type="text"
                             value={nicknameEntry}
                             onChange={e => setNicknameEntry(e.target.value)}
-                            inline={true}
+                            inline
                             placeholder="Nickname"
                         />
                         <Button

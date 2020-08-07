@@ -108,13 +108,16 @@ Button.defaultProps = {
 export interface ButtonGroupProps {
     wrap?: boolean;
     inline?: boolean;
+    align?: 'left'|'center'|'right';
 }
 
 export const ButtonGroup = styled.div<ButtonGroupProps>`
     display: ${props => props.inline ? 'inline-flex' : 'flex'};
     align-items: center;
     flex-wrap: ${props => props.wrap ? 'wrap' : 'nowrap'};
+    justify-content: ${props => props.align == 'center' ? 'center' : (props.align == 'right' ? 'flex-end' : 'flex-start')};
     margin: ${props => props.inline ? '0 -0.25rem' : '0.75rem -0.25rem'};
+    min-height: 2.5rem;
 
     * {
         margin: ${props => props.inline ? '0 0.25rem' : '0.25rem'};
@@ -129,6 +132,7 @@ export const FormControl = styled.div`
 
 export interface InputProps {
     inline?: boolean;
+    width?: string;
 }
 
 export const Input = styled.input<InputProps>`
@@ -143,11 +147,16 @@ export const Input = styled.input<InputProps>`
     padding: 0 0.5rem;
     transition: 100ms box-shadow;
     width: 100%;
-    max-width: 16rem;
+    max-width: ${props => props.width ?? '16rem'};
 
     &:focus {
         box-shadow: 0 0 0 0.1875rem ${props => transparentize(0.5, props.theme.colors.primary)};
         outline: none;
+    }
+
+    &:disabled {
+        user-select: none;
+        cursor: not-allowed;
     }
 
     ::placeholder {
@@ -165,30 +174,40 @@ export const VisuallyHidden = styled.span`
     white-space: nowrap;
 `;
 
-export type ToggleButtonProps = ButtonProps & { checked?: boolean, onChange?: (e: React.FormEvent) => void };
+export type ToggleButtonProps = ButtonProps & {
+    checked?: boolean,
+    onChange?: (e: React.FormEvent) => void,
+};
 
 const ToggleButtonBase = styled(Button)<ToggleButtonProps>`
     border: 0.125rem solid ${props => themeColor(props.theme, props.color!)};
     line-height: ${props => props.big ? '2.75rem' : '1.75rem'};
     padding: 0 ${props => props.big ? '1.375rem' : '0.875rem'};
     color: ${props => props.theme.colors.fg};
+    transition: 100ms box-shadow, 100ms background-color, 100ms color;
 
     ${props => props.checked ? css<ButtonProps>`
-        background-color: ${props => transparentize(0.75, themeColor(props.theme, props.color!))};
+        background-color: ${props => transparentize(0.25, themeColor(props.theme, props.color!))};
+        color: ${props => themeInvert(props.theme, props.color!)};
 
-        &:hover {
-            background-color: ${props => transparentize(0.5, themeColor(props.theme, props.color!))};
+        &:not(:disabled):hover {
+            background-color: ${props => themeColor(props.theme, props.color!)};
         }
     ` : css<ButtonProps>`
         background-color: transparent;
 
-        &:hover {
+        &:not(:disabled):hover {
             background-color: ${props => transparentize(0.9, themeColor(props.theme, props.color!))};
         }
     `}
+
+    &:disabled {
+        background-color: ${props => props.checked ? transparentize(0.25, themeColor(props.theme, props.color!)) : 'transparent'};
+        color: ${props => props.checked ? themeInvert(props.theme, props.color!) : props.theme.colors.fg};
+    }
 `;
 
-export const ToggleButton = (props: ToggleButtonProps): JSX.Element => (
+export const ToggleButton = (props: ToggleButtonProps & React.ButtonHTMLAttributes<HTMLButtonElement>): JSX.Element => (
     <label onClick={props.onChange}>
         <VisuallyHidden
             as="input"

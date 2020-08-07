@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react';
+import styled from 'styled-components';
 
+import { Button, ButtonGroup, Input, ToggleButton, ButtonGroupProps } from './ui';
 import { StoreProps } from './WerewolfState';
 import useSharedSocket from './use-shared-socket';
 import { cards } from '../lib/cards';
@@ -16,26 +18,26 @@ const selectables: { [key: string]: string[] } = {
 
 const sortedKeys = Object.keys(selectables).sort((a, b) => cards.indexOf(selectables[a][0]) - cards.indexOf(selectables[b][0]));
 
-interface SelectableCardProps {
-    name: string;
-    className: string;
-    onToggle?: () => void;
-    selected?: boolean;
-    disabled?: boolean;
-};
+function isSelected(cardsInPlay: string[], s: string): boolean {
+    if (s.startsWith('villager')) {
+        const numVillagersRepresented = parseInt(s.split(' ')[1]),
+            numVillagersActual = cardsInPlay.reduce((count, card) => card == 'villager' ? count + 1 : count, 0);
+        return numVillagersActual >= numVillagersRepresented;
+    } else {
+        return cardsInPlay.includes(selectables[s][0]);
+    }
+}
 
-const SelectableCard = ({
-    name,
-    className,
-    onToggle = () => {},
-    selected = false,
-    disabled = false
-}: SelectableCardProps): JSX.Element => (
-    <div className={`SelectableCard ${className}${selected ? ' selected' : ''}${disabled ? ' disabled' : ''}`} onClick={onToggle}>
-        {name}
-    </div>
-);
+const ToggleButtonCapitalized = styled(ToggleButton)`
+    text-transform: capitalize;
+`;
 
+const FadingButtonGroup = styled(ButtonGroup)<ButtonGroupProps & { fade: boolean }>`
+    input:not(:checked) + ${Button} {
+        transition: 1s opacity;
+        opacity: ${props => props.fade ? 0.25 : 1};
+    }
+`;
 
 const GameConfiguration = observer(({ store }: StoreProps): JSX.Element => {
     const [selected, setSelected] = useState<string[]>([]),
@@ -74,61 +76,68 @@ const GameConfiguration = observer(({ store }: StoreProps): JSX.Element => {
             numExpected = store.playerIdsInGame.length + 3;
 
         return (
-            <div className={isConfirming ? 'GameConfiguration confirm' : 'GameConfiguration'}>
+            <>
                 <h1>{isConfirming ? 'Confirm card selection' : 'Choose cards'}</h1>
-                {sortedKeys.map(s => (
-                    <SelectableCard
-                        name={s}
-                        className={selectables[s][0]}
-                        onToggle={isConfirming ? () => {} : onToggle.bind(null, s)}
-                        selected={selected.includes(s)}
-                        disabled={isConfirming}
-                        key={s}
-                    />
-                ))}
-                <p>
-                    {isConfirming ? <span>&nbsp;</span> : (
+                <FadingButtonGroup wrap align="center" fade={isConfirming}>
+                    {sortedKeys.map(s => (
+                        <ToggleButtonCapitalized
+                            color={`cards.${selectables[s][0]}`}
+                            checked={selected.includes(s)}
+                            onChange={onToggle.bind(null, s)}
+                            disabled={isConfirming}
+                            big
+                            key={s}
+                        >
+                            {s}
+                        </ToggleButtonCapitalized>
+                    ))}
+                </FadingButtonGroup>
+                <ButtonGroup align="center">
+                    {isConfirming || (
                         <>
-                            <button onClick={selectAll}>
-                                Select All
-                            </button>
-                            <button onClick={selectNone}>
-                                Select None
-                            </button>
+                            <Button onClick={selectAll}>
+                                Select all
+                            </Button>
+                            <Button onClick={selectNone} color="gray">
+                                Select none
+                            </Button>
                         </>
                     )}
-                </p>
+                </ButtonGroup>
                 <p>
                     Select {numExpected} cards for a game with {store.playerIdsInGame.length} players.
                 </p>
                 <p>
                     <label htmlFor="discussionLength">
                         Discussion length:&nbsp;
-                        <input
-                            type="text"
+                        <Input
                             inputMode="numeric"
                             pattern="[0-9]*"
-                            size={2}
                             value={discussionLengthMinutes}
                             onChange={e => setDiscussionLengthMinutes(e.target.value)}
                             id="discussionLength"
+                            inline
+                            width="4ch"
+                            disabled={isConfirming}
                         />
                         &nbsp; minutes
                     </label>
                 </p>
-                <p>
+                <div>
                     {numSelected == numExpected ? (
                         Number.isNaN(parseInt(discussionLengthMinutes)) ? (
                             'Enter the length of the discussion'
                         ) : (
-                            isConfirming ? (
-                                <>
-                                    <button onClick={() => sendCards(selected, true)}>Confirm</button>
-                                    <button onClick={() => setIsConfirming(false)}>Cancel</button>
-                                </>
-                            ) : (
-                                <button onClick={() => setIsConfirming(true)}>Start game</button>
-                            )
+                            <ButtonGroup align="center">
+                                {isConfirming ? (
+                                    <>
+                                        <Button onClick={() => sendCards(selected, true)}>Confirm</Button>
+                                        <Button onClick={() => setIsConfirming(false)} color="gray">Cancel</Button>
+                                    </>
+                                ) : (
+                                    <Button onClick={() => setIsConfirming(true)}>Start game</Button>
+                                )}
+                            </ButtonGroup>
                         )
                     ) : (
                         `Select ${Math.abs(numSelected - numExpected)}
@@ -136,23 +145,27 @@ const GameConfiguration = observer(({ store }: StoreProps): JSX.Element => {
                         ${Math.abs(numSelected - numExpected) == 1 ? 'card' : 'cards'}
                         to start.`
                     )}
-                </p>
-            </div>
+                </div>
+            </>
         );
     } else {
         return (
-            <div className="GameConfiguration">
+            <>
                 <h1>Leader is choosing cards</h1>
-                {sortedKeys.map(s => (
-                    <SelectableCard
-                        name={s}
-                        className={selectables[s][0]}
-                        selected={store.cardsInPlay.includes(selectables[s][0])}
-                        disabled={true}
-                        key={s}
-                    />
-                ))}
-            </div>
+                <ButtonGroup wrap align="center">
+                    {sortedKeys.map(s => (
+                        <ToggleButtonCapitalized
+                            color={`cards.${selectables[s][0]}`}
+                            checked={isSelected(store.cardsInPlay, s)}
+                            disabled
+                            big
+                            key={s}
+                        >
+                            {s}
+                        </ToggleButtonCapitalized>
+                    ))}
+                </ButtonGroup>
+            </>
         );
     }
 });

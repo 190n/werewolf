@@ -19,7 +19,7 @@ export default function JoinOrCreate(): JSX.Element {
                         inputMode="numeric"
                         pattern="[0-9]*"
                         maxLength={6}
-                        autoFocus={true}
+                        autoFocus
                         value={joinCode}
                         onChange={e => setJoinCode(e.target.value)}
                     />
