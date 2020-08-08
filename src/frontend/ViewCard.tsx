@@ -27,7 +27,7 @@ const ViewCard = observer(({ store }: StoreProps): JSX.Element => {
     }
 
     return (
-        <div className="ViewCard">
+        <>
             {store.ownCard === undefined ? (
                 <p>Waiting to be assigned a card...</p>
             ) : (
@@ -44,7 +44,7 @@ const ViewCard = observer(({ store }: StoreProps): JSX.Element => {
                     )}
                 </>
             )}
-        </div>
+        </>
     );
 });
 

@@ -6,7 +6,7 @@ import { Button, ButtonGroup, Input } from './ui';
 import { StoreProps } from './WerewolfState';
 import useSharedSocket from './use-shared-socket';
 
-const FloatingContainer = styled.div`
+const FloatingContainerRight = styled.div`
     position: fixed;
     right: 0.5rem;
     bottom: 0.25rem;
@@ -50,7 +50,7 @@ const InGameUI = observer(({ store }: StoreProps): JSX.Element => {
     }
 
     return (
-        <FloatingContainer>
+        <FloatingContainerRight>
             <ErrorMessage>{rejectionReason}</ErrorMessage>
             <ButtonGroup inline={true}>
                 {isFormExpanded ? (
@@ -85,7 +85,7 @@ const InGameUI = observer(({ store }: StoreProps): JSX.Element => {
                     </Button>
                 )}
             </ButtonGroup>
-        </FloatingContainer>
+        </FloatingContainerRight>
     );
 });
 

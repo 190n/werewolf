@@ -372,3 +372,17 @@ export const Tag = styled.span<TagProps>`
     background-color: ${props => themeColor(props.theme, `cards.${props.card}`)};
     user-select: none;
 `;
+
+export const IconButton = styled.button`
+    appearance: none;
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    height: 2rem;
+    padding: 0;
+
+    svg {
+        width: 2rem;
+        height: 2rem;
+    }
+`;

@@ -12,7 +12,9 @@ import JoinOrCreate from './JoinOrCreate';
 import Join from './Join';
 import InGameDispatch from './InGameDispatch';
 import Create from './Create';
+import SettingsOverlay from './SettingsOverlay';
 import theme from './theme';
+
 
 const App = ({ store }: StoreProps): JSX.Element => (
     <ThemeProvider theme={theme}>
@@ -35,6 +37,7 @@ const App = ({ store }: StoreProps): JSX.Element => (
                     </Switch>
                 </Router>
             </FlexibleContainer>
+            <SettingsOverlay />
         </Root>
     </ThemeProvider>
 );
