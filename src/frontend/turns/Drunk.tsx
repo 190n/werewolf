@@ -38,7 +38,7 @@ const Drunk: TurnComponent = observer(({ store: { ownActions, revelations }, onA
                 <p>
                     The <strong>{['leftmost', 'middle', 'rightmost'][parseInt(ownActions[0])]}</strong>
                     &nbsp;card in the center was the <Tag card={revelations[0]} />. You now have that
-                    card, and your card is in the center.
+                    card, and your original card is in the center.
                 </p>
                 <Button onClick={() => onAction('')} disabled={ownActions.length > 1}>OK</Button>
             </>
