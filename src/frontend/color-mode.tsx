@@ -6,6 +6,7 @@ export type ColorModePreference = ColorMode | 'system';
 
 interface ColorModeContextType {
     colorMode: ColorMode;
+    colorModePreference: ColorModePreference;
     setColorModePreference: (pref: ColorModePreference) => void;
 }
 
@@ -52,7 +53,7 @@ export const ColorModeProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }, [colorMode]);
 
     return (
-        <ColorModeContext.Provider value={{ colorMode, setColorModePreference }}>
+        <ColorModeContext.Provider value={{ colorMode, colorModePreference, setColorModePreference }}>
             {children}
         </ColorModeContext.Provider>
     );

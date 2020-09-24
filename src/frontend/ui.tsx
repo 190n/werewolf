@@ -387,4 +387,8 @@ export const IconButton = styled.button`
         width: 2rem;
         height: 2rem;
     }
+
+    &:not(:last-of-type) {
+        margin-right: 0.5rem;
+    }
 `;
