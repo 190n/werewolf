@@ -5,8 +5,22 @@
         <meta name="viewport" content="width=device-width,initial-scale=1">
         <title>Werewolf</title>
         <link rel="stylesheet" href="fonts.css">
+        <style>
+            body.dark {
+                background-color: #181818;
+            }
+        </style>
     </head>
     <body>
+        <script>
+            const pref = window.localStorage.getItem('colorModePreference');
+
+            if (pref == 'dark') {
+                document.body.classList.add('dark');
+            } else if (pref == 'system' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)')) {
+                document.body.classList.add('dark');
+            }
+        </script>
         <main id="app"></main>
         <script src="index.tsx"></script>
     </body>

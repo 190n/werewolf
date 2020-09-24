@@ -139,6 +139,7 @@ export const Input = styled.input<InputProps>`
     box-sizing: border-box;
     display: ${props => props.inline ? 'inline' : 'block'};
     background-color: ${props => props.theme.colors.bg};
+    color: ${props => props.theme.colors.fg};
     border: 0.125rem solid ${props => props.theme.colors.primary};
     border-radius: 0.25rem;
     font-size: 1rem;

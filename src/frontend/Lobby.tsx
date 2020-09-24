@@ -1,7 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 
-import { Button } from './ui';
+import { Button, ExternalLink } from './ui';
 import { StoreProps } from './WerewolfState';
 import PlayerList from './PlayerList';
 import useSharedSocket from './use-shared-socket';
@@ -29,7 +29,7 @@ const Lobby = observer(({ store }: StoreProps): JSX.Element => {
                 Join code: {store.gameId}
             </p>
             <p>
-                Link to join: <a href={`${frontendBaseUrl}/${store.gameId}`}>{frontendBaseUrl}/{store.gameId}</a>
+                Link to join: <ExternalLink href={`${frontendBaseUrl}/${store.gameId}`}>{frontendBaseUrl}/{store.gameId}</ExternalLink>
             </p>
             <PlayerList store={store} />
             {store.isLeader && (

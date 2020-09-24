@@ -1,9 +1,9 @@
-const theme = {
+const lightTheme = {
     colors: {
-        fg: '#222',
+        fg: '#212121',
         bg: 'white',
         lightText: 'white',
-        darkText: '#222',
+        darkText: '#212121',
         primary: '#311b92',
         gray: '#bdbdbd',
         danger: '#b71c1c',
@@ -32,4 +32,20 @@ const theme = {
     },
 };
 
-export default theme;
+const darkTheme = {
+    ...lightTheme,
+    colors: {
+        ...lightTheme.colors,
+        fg: 'white',
+        bg: '#181818',
+        gray: '#757575',
+        primary: '#512da8',
+        link: '#4fc3f7',
+        cards: {
+            ...lightTheme.colors.cards,
+            werewolf: '#424242',
+        }
+    },
+};
+
+export default { light: lightTheme, dark: darkTheme };
