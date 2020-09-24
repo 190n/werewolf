@@ -6,9 +6,13 @@ import { mix } from 'polished';
 import { Button } from './ui';
 import { StoreProps } from './WerewolfState';
 import useSharedSocket from './use-shared-socket';
+import { useColorMode } from './color-mode';
 
 const CardReveal = styled.h1<{ card: string }>`
-    color: ${props => mix(0.25, '#000000', props.theme.colors.cards[props.card])};
+    color: ${props => {
+        const { colorMode } = useColorMode();
+        return mix(colorMode == 'light' ? 0.25 : 0.5, colorMode == 'light' ? '#000' : '#fff', props.theme.colors.cards[props.card])
+    }};
 
     span {
         text-transform: capitalize;

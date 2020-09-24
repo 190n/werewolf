@@ -36,7 +36,7 @@ const darkTheme = {
     ...lightTheme,
     colors: {
         ...lightTheme.colors,
-        fg: 'white',
+        fg: '#eee',
         bg: '#181818',
         gray: '#757575',
         primary: '#512da8',

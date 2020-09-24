@@ -381,6 +381,7 @@ export const IconButton = styled.button`
     border: none;
     height: 2rem;
     padding: 0;
+    color: ${props => props.theme.colors.fg};
 
     svg {
         width: 2rem;
