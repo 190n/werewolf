@@ -231,7 +231,7 @@ export interface FlexibleContainerProps {
 export const FlexibleContainer = styled.div<FlexibleContainerProps>`
     width: 100%;
     max-width: ${props => props.width};
-    margin: auto;
+    margin: 0 auto;
     ${props => props.center && css`text-align: center;`}
 `;
 

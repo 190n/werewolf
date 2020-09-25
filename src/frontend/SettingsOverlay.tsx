@@ -67,9 +67,13 @@ export default function SettingsOverlay(): JSX.Element {
                 <source src={cafFile} type="audio/x-caf; codecs=opus" />
                 <source src={m4aFile} type="audio/mp4; codecs=mp4a.40.2" />
             </audio>
-            <ColorModeSelect colorMode={colorMode} onChange={e => setColorModePreference(e.target.value as ColorModePreference)}>
+            <ColorModeSelect
+                colorMode={colorMode}
+                value={colorModePreference}
+                onChange={e => setColorModePreference(e.target.value as ColorModePreference)}
+            >
                 {Object.keys(prefNames).map(p => (
-                    <option value={p} selected={p == colorModePreference}>{prefNames[p]}</option>
+                    <option value={p} key={p}>{prefNames[p]}</option>
                 ))}
             </ColorModeSelect>
             <IconButton onClick={playPause}>
