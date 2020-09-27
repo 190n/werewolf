@@ -32,6 +32,8 @@ export const Root = styled.div`
     background-size: 100% 0.5rem;
     line-height: 1.5rem;
     padding: 1rem;
+    width: calc(100vw - 2rem);
+    overflow: hidden;
 
     h1, h2, h3, h4, h5, h6 {
         font-family: ${props => props.theme.fonts.heading};
