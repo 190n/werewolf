@@ -66,7 +66,7 @@ export default async function createApi(app: Express, redisCall: <T>(command: ke
     app.get('/games/join', async (req, res) => {
         const { gameId, nick } = req.query;
 
-        if (gameId === undefined || nick === undefined) {
+        if (typeof gameId != 'string' || typeof nick != 'string') {
             res.status(400);
             res.json({ id: null, error: 'Must specify gameId and nick in querystring.' });
             return;

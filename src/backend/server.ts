@@ -52,7 +52,7 @@ server.on('upgrade', (request: http.IncomingMessage, socket: net.Socket, head: B
 
         wss.handleUpgrade(request, socket, head, ws => {
             wss.emit('connection', ws, request);
-            handleConnection(ws, queryString.gameId, queryString.playerId);
+            handleConnection(ws, queryString.gameId as string, queryString.playerId as string);
         });
     } else {
         socket.destroy();
