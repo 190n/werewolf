@@ -16,7 +16,7 @@ app.use((req, res, next) => {
     next();
 });
 
-const redisClient = redis.createClient();
+const redisClient = redis.createClient(process.env.REDIS_URL ?? 'redis://localhost:6379');
 redisClient.on('error', err => {
     console.error(`Redis error: ${err}`);
 });
@@ -59,6 +59,8 @@ server.on('upgrade', (request: http.IncomingMessage, socket: net.Socket, head: B
     }
 });
 
-server.listen(5000, () => {
-    console.log('Listening on port 5000');
+const port = parseInt(process.env.PORT ?? '5000');
+
+server.listen(port, () => {
+    console.log(`Listening on port ${port}`);
 });
