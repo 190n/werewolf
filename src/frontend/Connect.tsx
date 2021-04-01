@@ -6,6 +6,7 @@ import { ReadyState } from 'react-use-websocket';
 import { Link } from './ui';
 import { StoreProps } from './WerewolfState';
 import useSharedSocket from './use-shared-socket';
+import { backgrounds } from 'polished';
 
 const Connect = observer(({ store }: StoreProps): JSX.Element => {
     const { gameId, playerId } = useParams<{ gameId: string, playerId: string }>();

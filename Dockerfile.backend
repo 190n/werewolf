@@ -1,0 +1,14 @@
+FROM node:14-alpine AS build
+WORKDIR /app
+COPY . .
+RUN yarn
+RUN yarn build-ts
+
+FROM node:14-alpine
+WORKDIR /app
+COPY --from=build /app/dist/backend /app/package.json /app/yarn.lock ./
+ENV NODE_ENV=production
+RUN yarn
+
+EXPOSE 5000
+ENTRYPOINT ["node", "./server.js"]
