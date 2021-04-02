@@ -1,0 +1,18 @@
+ARG FRONTEND_BASE_URL=""
+ARG BACKEND_BASE_URL=""
+ARG BACKEND_BASE_SOCKET_URL=""
+
+FROM node:14-alpine AS build
+WORKDIR /app
+COPY . .
+RUN yarn
+RUN yarn global add parcel-bundler
+RUN rm -fr dist .env .env.production
+ENV NODE_ENV=production
+RUN parcel build src/frontend/index.html
+
+
+
+FROM caddy:alpine
+COPY --from=build /app/dist/ /srv
+COPY Caddyfile /etc/caddy/
