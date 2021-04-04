@@ -1,5 +1,6 @@
 import http from 'http';
 import net from 'net';
+import fs from 'fs';
 
 import express from 'express';
 import WebSocket from 'ws';
@@ -15,6 +16,29 @@ app.use((req, res, next) => {
     res.set('Access-Control-Allow-Origin', '*');
     next();
 });
+
+const staticRoot = process.env.STATIC_ROOT;
+if (typeof staticRoot == 'string' && fs.statSync(staticRoot).isDirectory) {
+    app.use((req, res, next) => {
+        // url is either /[number]... or /(create|cheatsheet)/?
+        if (/^\/\d|^\/(create|cheatsheet)\/?$/.test(req.url)) {
+            req.url = '/';
+        }
+        next();
+    });
+
+    app.use(express.static(staticRoot, {
+        setHeaders(res, path) {
+            if (path.endsWith('index.html')) {
+                // don't cache index.html
+                res.setHeader('Cache-Control', 'no-cache');
+            } else {
+                // cache everything else for a year since they are fingerprinted
+                res.setHeader('Cache-Control', 'public, max-age=31536000');
+            }
+        }
+    }));
+}
 
 const redisClient = redis.createClient(process.env.REDIS_URL ?? 'redis://localhost:6379');
 redisClient.on('error', err => {
