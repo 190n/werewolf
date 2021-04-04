@@ -23,6 +23,8 @@ if (typeof staticRoot == 'string' && fs.statSync(staticRoot).isDirectory) {
         // url is either /[number]... or /(create|cheatsheet)/?
         if (/^\/\d|^\/(create|cheatsheet)\/?$/.test(req.url)) {
             req.url = '/';
+        } else if (/^\/(backend|lib)/.test(req.url)) {
+            res.status(404);
         }
         next();
     });
