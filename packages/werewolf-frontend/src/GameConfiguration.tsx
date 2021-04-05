@@ -5,7 +5,24 @@ import styled from 'styled-components';
 import { Button, ButtonGroup, Input, ToggleButtonCapitalized, ButtonGroupProps } from './ui';
 import { StoreProps } from './WerewolfState';
 import useSharedSocket from './use-shared-socket';
-import { cards } from '../lib/cards';
+
+const cards = [
+    'werewolf',
+    'werewolf',
+    'minion',
+    'mason',
+    'mason',
+    'seer',
+    'robber',
+    'troublemaker',
+    'drunk',
+    'insomniac',
+    'tanner',
+    'hunter',
+    'villager',
+    'villager',
+    'villager',
+];
 
 const selectables: { [key: string]: string[] } = {
     ...Object.fromEntries(cards.filter(c => c != 'werewolf' && c != 'mason' && c != 'villager').map(c => [c, [c]])),

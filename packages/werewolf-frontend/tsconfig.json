@@ -63,10 +63,5 @@
         /* Advanced Options */
         "forceConsistentCasingInFileNames": true,  /* Disallow inconsistently-cased references to the same file. */
         "skipLibCheck": true,
-    },
-    "include": [
-        "src/backend/**/*",
-        // "src/frontend/**/*",
-        "src/lib/**/*"
-    ]
+    }
 }
