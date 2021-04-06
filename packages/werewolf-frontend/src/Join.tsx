@@ -7,7 +7,7 @@ import { StoreProps } from './WerewolfState';
 import { backendBaseUrl } from './config';
 
 const Join = observer(({ store }: StoreProps): JSX.Element => {
-    const { gameId } = useParams(),
+    const { gameId } = useParams<{ gameId: string }>(),
         [nick, setNick] = useState(new URLSearchParams(location.search).get('nick')),
         [error, setError] = useState<string | undefined>(undefined),
         [submitted, setSubmitted] = useState(nick != null);

@@ -11,7 +11,8 @@ const lightTheme = {
         lastSeconds: '#e65100',
         link: '#0277bd',
         cards: {
-            doppelganger: '#00a0c0',
+            // doppelganger: '#00a0c0',
+            doppelganger: '#ff0',
             werewolf: '#000',
             minion: '#603000',
             mason: '#805080',

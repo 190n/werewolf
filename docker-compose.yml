@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  backend:
+    image: "190n/werewolf:latest"
+    depends_on:
+      - redis
+    environment:
+      - REDIS_URL=redis://redis:6379
+    ports:
+      - 5000:5000
+  redis:
+    image: "redis:alpine"

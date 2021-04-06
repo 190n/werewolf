@@ -19,5 +19,9 @@ export default function useSharedSocket(options: Omit<Options, 'share' | 'queryP
         ...options,
     }), []);
 
-    return useWebSocket(`${backendBaseSocketUrl}/connect`, fullOptions);
+    const url = backendBaseSocketUrl == ''
+        ? `${window.location.protocol.replace('http', 'ws')}//${window.location.host}/connect`
+        : `${backendBaseSocketUrl}/connect`;
+
+    return useWebSocket(url, fullOptions);
 }
