@@ -363,18 +363,38 @@ export const Radio = (props: React.InputHTMLAttributes<HTMLInputElement>): JSX.E
 export interface TagProps {
     card: string;
     children?: React.ReactNode;
+    doppelganger?: boolean;
 }
 
-export const Tag = styled.span<TagProps>`
-    ${props => props.children === undefined && css`&::after { content: "${props.card}"; }`}
+const TagBase = styled.span<TagProps>`
     color: ${props => themeInvert(props.theme, `cards.${props.card}`)};
+    ${props => getLuminance(themeColor(props.theme, `cards.${props.card}`)) <= 0.4 && css`
+        text-shadow: 0 0.0625rem 0.0625rem ${props => props.theme.colors.darkText};
+    `}
     padding: 0.125rem 0.375rem;
     border-radius: 1rem;
     font-weight: bold;
     text-transform: capitalize;
     background-color: ${props => themeColor(props.theme, `cards.${props.card}`)};
     user-select: none;
+    white-space: nowrap;
+    ${props => props.doppelganger && css`
+        background-image: linear-gradient(90deg,
+            ${props => transparentize(0.5, props.theme.colors.cards.doppelganger)},
+            ${props => transparentize(0.75, props.theme.colors.cards.doppelganger)} 30%,
+            transparent
+        );
+        background-repeat: no-repeat;
+    `}
 `;
+
+export const Tag = ({ card, children }: Omit<TagProps, 'doppelganger'>) => {
+    if (card.startsWith('d_')) {
+        return <TagBase card={card.substr(2)} doppelganger>D| {children ?? card.substr(2)}</TagBase>;
+    } else {
+        return <TagBase card={card}>{children ?? card}</TagBase>;
+    }
+};
 
 export const IconButton = styled.button`
     appearance: none;
