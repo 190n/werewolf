@@ -6,16 +6,14 @@ import { transparentize } from 'polished';
 import { StoreProps } from './WerewolfState';
 
 const Countdown = styled.h1<{ totalSeconds: number }>`
-    h1& {
-        font-size: 8rem;
-        line-height: 8rem;
-        font-feature-settings: "tnum";
-        transition: 1s color, 1s text-shadow;
-        color: ${props => props.totalSeconds < 10 ? props.theme.colors.lastSeconds : (props.totalSeconds < 60 ? props.theme.colors.danger : props.theme.colors.fg)};
-        text-shadow: ${props => props.totalSeconds < 10
-            ? `0 0 2rem ${transparentize(0.5, props.theme.colors.lastSeconds)}`
-            : `0 0 0 ${transparentize(0.5, props.theme.colors.lastSeconds)}`};
-    }
+    font-size: 8rem !important;         // !important = workaround until https://github.com/styled-components/styled-components/issues/3401 is fixed
+    line-height: 8rem !important;       // once it is, wrap all these styles in h1& {} to increase specificity
+    font-feature-settings: "tnum";
+    transition: 1s color, 1s text-shadow;
+    color: ${props => props.totalSeconds < 10 ? props.theme.colors.lastSeconds : (props.totalSeconds < 60 ? props.theme.colors.danger : props.theme.colors.fg)};
+    text-shadow: ${props => props.totalSeconds < 10
+        ? `0 0 2rem ${transparentize(0.5, props.theme.colors.lastSeconds)}`
+        : `0 0 0 ${transparentize(0.5, props.theme.colors.lastSeconds)}`};
 `;
 
 const Discussion = observer(({ store }: StoreProps): JSX.Element => {
