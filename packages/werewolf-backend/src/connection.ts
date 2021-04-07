@@ -12,25 +12,6 @@ import {
     mayWait,
 } from './game';
 
-interface EndMessage {
-    type: 'end';
-    reason: string;
-}
-
-interface AssignIdMessage {
-    type: 'id';
-    id: string;
-}
-
-interface PlayerListMessage {
-    type: 'players';
-    players: Array<{
-        nick?: string;
-        id: string;
-        isLeader: boolean;
-    }>;
-}
-
 const openSockets = new Map<string, Map<string, WebSocket>>();
 
 export default function createHandler(redisCall: <T>(command: keyof Commands<boolean>, ...args: any[]) => Promise<T>) {
@@ -403,7 +384,9 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                                     stage: 'wait',
                                 }));
 
-                                await redisCall('hset', 'forcedWaits', `${gameId}:${p}`, Math.floor(Date.now() / 1000 + 15).toString());
+                                // wait between 7 and 15 seconds
+                                const waitTime = Math.floor(Math.random() * 9 + 7);
+                                await redisCall('hset', 'forcedWaits', `${gameId}:${p}`, Math.floor(Date.now() / 1000 + waitTime).toString());
                                 await redisCall('sadd', `games:${gameId}:waiting`, p);
                             } else {
                                 if (canTakeAction(p, await getAssignedCards(gameId), [])) {
