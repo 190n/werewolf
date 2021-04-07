@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { observer } from 'mobx-react';
 
-import { Button } from './ui';
 import useSharedSocket from './use-shared-socket';
 import { StoreProps } from './WerewolfState';
 import Connect from './Connect';

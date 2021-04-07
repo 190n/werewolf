@@ -1,41 +1,20 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 
-import { StoreProps, Player as PlayerType } from './WerewolfState';
-
-export interface PlayerProps {
-    player: PlayerType;
-    index: number;
-    isSelf: boolean;
-}
-
-export function Player({ player: { nick }, index, isSelf }: PlayerProps): JSX.Element {
-    let className = 'Player';
-    if (typeof nick != 'string' || nick.startsWith('Player')) {
-        className += ' unnamed';
-    }
-    if (isSelf) {
-        className += ' self';
-    }
-
-    return (
-        <div className={className}>
-            {
-                typeof nick == 'string'
-                ? nick
-                : `Unnamed Player ${index + 1}`
-            }
-        </div>
-    );
-}
+import { ToggleButton, ButtonGroup } from './ui';
+import { StoreProps } from './WerewolfState';
 
 const PlayerList = observer(({ store }: StoreProps): JSX.Element => {
     return (
-        <div className="PlayerList">
+        <ButtonGroup align="center">
             {
-                store.players.map((p, i) => <Player player={p} index={i} isSelf={p.id == store.ownId} key={p.id} />)
+                store.players.map(p => (
+                    <ToggleButton big disabled style={{ cursor: 'default' }} key={p.id}>
+                        {p.nick}{p.isLeader && <small>(host)</small>}
+                    </ToggleButton>
+                ))
             }
-        </div>
+        </ButtonGroup>
     );
 });
 
