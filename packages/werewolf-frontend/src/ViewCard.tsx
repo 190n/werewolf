@@ -47,6 +47,7 @@ const ViewCard = observer(({ store }: StoreProps): JSX.Element => {
                             <>
                                 Waiting for&nbsp;
                                 <PlayerNameList players={store.waitingOn.map(id => store.playersById[id])} />
+                                &nbsp;to confirm...
                             </>
                         ) : 'Waiting for other players to confirm...'
                     ) : (
