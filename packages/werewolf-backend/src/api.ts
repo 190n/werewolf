@@ -1,13 +1,20 @@
 import { Express } from 'express';
 import { Commands } from 'redis';
 
-import { generateId } from './util';
+function generateId(len: number = 16): string {
+    if (len > 8) return generateId(8) + generateId(len - 8);
+
+    const num = Math.floor(Math.random() * (36 ** len));
+
+    let id = num.toString(36);
+    if (id.length < len) {
+        id = '0'.repeat(len - id.length) + id;
+    }
+    return id;
+}
+
 
 export default async function createApi(app: Express, redisCall: <T>(command: keyof Commands<boolean>, ...args: any[]) => Promise<T>) {
-    async function generateIdForPlayer(gameId: string, len: number = 16) {
-        const numPlayers = await redisCall<number>('scard', `games:${gameId}:players`);
-        return generateId(len, numPlayers + 1);
-    }
     async function createGameId(): Promise<string|null> {
         const len = await redisCall<number>('hlen', 'gameKeys');
         if (len >= 1000000) {
@@ -39,7 +46,7 @@ export default async function createApi(app: Express, redisCall: <T>(command: ke
         }
 
         const gameId = await createGameId(),
-            key = generateId(16, 0);
+            key = generateId(16);
         if (gameId != null) {
             await redisCall('hset', 'gameKeys', gameId, key);
             await redisCall('sadd', `games:${gameId}:players`, key);
@@ -88,7 +95,7 @@ export default async function createApi(app: Express, redisCall: <T>(command: ke
             }
 
             // generate an id
-            const id = await generateIdForPlayer(gameId);
+            const id = generateId();
             // save it to redis
             await redisCall('sadd', `games:${gameId}:players`, id);
             await redisCall('hset', `games:${gameId}:nicks`, id, nick);

@@ -5,7 +5,7 @@ import { Button, Tag } from '../ui';
 import { TurnComponent } from '../Turn';
 import { getPlayersFromRevelation } from '../util';
 
-const Mason: TurnComponent = observer(({ store: { playersInGame, revelations, ownActions }, onAction }) => {
+const Mason: TurnComponent = observer(({ store: { playersById, revelations, ownActions }, onAction }) => {
     if (revelations.length == 0) {
         return (
             <p>Waiting for server...</p>
@@ -13,7 +13,7 @@ const Mason: TurnComponent = observer(({ store: { playersInGame, revelations, ow
     } else {
         let message: JSX.Element;
 
-        const otherMasons = getPlayersFromRevelation(revelations[0], playersInGame);
+        const otherMasons = getPlayersFromRevelation(revelations[0], playersById);
         if (otherMasons.length == 0) {
             message = (
                 <p>You are the only <Tag card="mason" />.</p>

@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import { Button, ButtonGroup, Tag, ToggleButton } from '../ui';
 import { TurnComponent } from '../Turn';
 
-const Robber: TurnComponent = observer(({ store: { playersInGame, revelations, ownActions, ownId }, onAction }) => {
+const Robber: TurnComponent = observer(({ store: { playersInGame, revelations, ownActions, ownId, nicks }, onAction }) => {
     const [choice, setChoice] = useState('');
 
     if (revelations.length == 0) {
@@ -32,7 +32,7 @@ const Robber: TurnComponent = observer(({ store: { playersInGame, revelations, o
         return (
             <>
                 <p>
-                    <strong>{playersInGame.find(p => p.id == ownActions[0])?.nick}</strong>'s card
+                    <strong>{nicks[ownActions[0]]}</strong>'s card
                     was the <Tag card={revelations[0]} />. You now have that card, and they have
                     your <Tag card="robber" /> card.
                 </p>

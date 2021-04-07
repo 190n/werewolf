@@ -55,6 +55,8 @@ const InGameDispatch = observer(({ store }: StoreProps): JSX.Element => {
                 store.discussionEndTime = message.time;
             } else if (message.type == 'results') {
                 store.results = message.results;
+            } else if (message.type == 'waitingOn') {
+                store.waitingOn = message.waitingOn;
             }
         } catch (e) {}
     }

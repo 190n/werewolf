@@ -4,7 +4,7 @@ export type Stage = 'joining' | 'lobby' | 'cardSelection' | 'viewCard' | 'wait' 
 
 export interface Player {
     id: string;
-    nick?: string;
+    nick: string;
     isLeader: boolean;
 }
 
@@ -32,9 +32,10 @@ export default class WerewolfState {
     @observable public events: ['r' | 'a', string][] = [];
     @observable public discussionEndTime: number = -1;
     @observable public results: GameResults | undefined = undefined;
+    @observable public waitingOn: string[] = [];
 
     @computed public get me(): Player | undefined {
-        return this.players.find(p => p.id == this.ownId);
+        return this.playersById[this.ownId];
     }
 
     @computed public get isLeader(): boolean {
@@ -59,6 +60,14 @@ export default class WerewolfState {
 
     @computed public get ownActions(): string[] {
         return this.events.filter(e => e[0] == 'a').map(e => e[1]);
+    }
+
+    @computed public get nicks(): Record<string, string> {
+        return Object.fromEntries(this.players.map(p => [p.id, p.nick]));
+    }
+
+    @computed public get playersById(): Record<string, Player> {
+        return Object.fromEntries(this.players.map(p => [p.id, p]));
     }
 }
 

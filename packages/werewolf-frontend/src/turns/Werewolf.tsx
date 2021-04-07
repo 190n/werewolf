@@ -6,7 +6,7 @@ import { TurnComponent } from '../Turn';
 import { getPlayersFromRevelation } from '../util';
 import PlayerNameList from '../PlayerNameList';
 
-const Werewolf: TurnComponent = observer(({ store: { playersInGame, revelations, ownActions }, onAction }) => {
+const Werewolf: TurnComponent = observer(({ store: { playersById, revelations, ownActions }, onAction }) => {
     const [selectedCard, setSelectedCard] = useState(-1);
 
     if (revelations.length == 0) {
@@ -16,7 +16,7 @@ const Werewolf: TurnComponent = observer(({ store: { playersInGame, revelations,
             </p>
         );
     } else if (revelations.length == 1) {
-        const otherWerewolves = getPlayersFromRevelation(revelations[0], playersInGame);
+        const otherWerewolves = getPlayersFromRevelation(revelations[0], playersById);
 
         if (otherWerewolves.length > 0) {
             let message: JSX.Element;

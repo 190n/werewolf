@@ -41,7 +41,7 @@ const Vote = observer(({ store }: StoreProps): JSX.Element => {
                     Vote for no one
                 </Button>
                 <Button disabled={choice == '' || submitted} onClick={() => submitVote(false)}>
-                    Vote{choice != '' && ` for ${store.playersInGame.find(p => p.id == choice)!.nick}`}
+                    Vote{choice != '' && ` for ${store.nicks[choice]}`}
                 </Button>
             </ButtonGroup>
         </>

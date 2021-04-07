@@ -6,10 +6,6 @@ import { Button, Tag } from './ui';
 import { GameResults, StoreProps, Player } from './WerewolfState';
 import PlayerNameList from './PlayerNameList';
 
-function getPlayerName(playerId: string, playersInGame: Player[]): string {
-    return playersInGame.find(p => p.id == playerId)!.nick!;
-}
-
 const CenteredList = styled.ul`
     display: inline-flex;
     flex-direction: column;
@@ -54,17 +50,17 @@ const CardDisplay = ({ cards, center, playersInGame }: CardDisplayProps): JSX.El
 
 interface SwapDisplayProps {
     results: GameResults;
-    playersInGame: Player[];
+    nicks: Record<string, string>;
 }
 
-function SwapDisplay({ results: { initialCards, initialCenter, swaps }, playersInGame }: SwapDisplayProps): JSX.Element {
+function SwapDisplay({ results: { initialCards, initialCenter, swaps }, nicks }: SwapDisplayProps): JSX.Element {
     function renderCardOwner(whichCard: string | number, swapper: string): React.ReactNode {
         if (whichCard == swapper) {
             return 'their own card';
         } else if (typeof whichCard == 'string') {
             return (
                 <>
-                    <strong>{getPlayerName(whichCard, playersInGame)}</strong>'s card
+                    <strong>{nicks[whichCard]}</strong>'s card
                 </>
             );
         } else {
@@ -101,7 +97,7 @@ function SwapDisplay({ results: { initialCards, initialCenter, swaps }, playersI
 
         listItems.push(
             <li key={player}>
-                <strong>{getPlayerName(player, playersInGame)}</strong> (as <Tag card={initialCards[player]} />)
+                <strong>{nicks[player]}</strong> (as <Tag card={initialCards[player]} />)
                 swapped {renderCardOwner(card1, player)} (<Tag card={orig1} />)
                 with {renderCardOwner(card2, player)} (<Tag card={orig2} />).
             </li>
@@ -111,7 +107,7 @@ function SwapDisplay({ results: { initialCards, initialCenter, swaps }, playersI
     return (<CenteredList as="ol">{listItems}</CenteredList>);
 }
 
-const Results = observer(({ store: { results, ownId, playersInGame } }: StoreProps) => {
+const Results = observer(({ store: { results, ownId, nicks, playersById, playersInGame } }: StoreProps) => {
     const [viewingFinalCards, setViewingFinalCards] = useState(true);
 
     if (results === undefined) {
@@ -129,8 +125,8 @@ const Results = observer(({ store: { results, ownId, playersInGame } }: StorePro
             villagers: 'The villagers',
             nobody: 'No one',
         }[results.winningTeam],
-            winningPlayers = results.winners.map(id => playersInGame.find(p => p.id == id) as Player),
-            executedPlayers = results.executed.map(id => playersInGame.find(p => p.id == id) as Player);
+            winningPlayers = results.winners.map(id => playersById[id]),
+            executedPlayers = results.executed.map(id => playersById[id]);
 
 
         return (
@@ -146,7 +142,7 @@ const Results = observer(({ store: { results, ownId, playersInGame } }: StorePro
                     won.
                 </p>
                 <p>
-                    {results.executed.length > 0 ? ( // TODO: maintain grammar
+                    {results.executed.length > 0 ? (
                         <>
                             <PlayerNameList players={executedPlayers} ownId={ownId} />
                             {(executedPlayers.length == 1 && executedPlayers[0].id != ownId) ? ' was ' : ' were '}
@@ -173,17 +169,17 @@ const Results = observer(({ store: { results, ownId, playersInGame } }: StorePro
                     <div>
                         <h2>Votes:</h2>
                         <CenteredList>
-                            {Object.entries(results.votes).map(([player, vote]) => (
-                                <li key={player}>
-                                    <strong>{getPlayerName(player, playersInGame)}</strong> voted for&nbsp;
-                                    {vote == '' ? 'no one' : <strong>{getPlayerName(vote, playersInGame)}</strong>}.
+                            {Object.entries(results.votes).map(([playerId, vote]) => (
+                                <li key={playerId}>
+                                    <strong>{nicks[playerId]}</strong> voted for&nbsp;
+                                    {vote == '' ? 'no one' : <strong>{nicks[vote]}</strong>}.
                                 </li>
                             ))}
                         </CenteredList>
                     </div>
                 </Row><br />
                 <h2>Card swaps:</h2>
-                <SwapDisplay results={results} playersInGame={playersInGame} />
+                <SwapDisplay results={results} nicks={nicks} />
             </>
         );
     }

@@ -360,6 +360,10 @@ export default function createHandler(redisCall: <T>(command: keyof Commands<boo
                     // TODO: probably need to tell player whether they have confirmed, so reloading
                     // will preserve their confirmation
 
+                    // send list of players that have not confirmed yet
+                    const haveNotConfirmed = await redisCall<string[]>('sdiff', `games:${gameId}:playersInGame`, `games:${gameId}:haveConfirmed`);
+                    await broadcast(gameId, { type: 'waitingOn', waitingOn: haveNotConfirmed }, true);
+
                     if (await redisCall<number>('scard', `games:${gameId}:haveConfirmed`) >= await redisCall<number>('scard', `games:${gameId}:playersInGame`)) {
                         // time for actions
 

@@ -7,6 +7,7 @@ import { Button } from './ui';
 import { StoreProps } from './WerewolfState';
 import useSharedSocket from './use-shared-socket';
 import { useColorMode } from './color-mode';
+import PlayerNameList from './PlayerNameList';
 
 const CardReveal = styled.h1<{ card: string }>`
     color: ${props => {
@@ -42,7 +43,12 @@ const ViewCard = observer(({ store }: StoreProps): JSX.Element => {
                     </CardReveal>
                     <br />
                     {hasConfirmed ? (
-                        'Waiting for other players to confirm...'
+                        store.waitingOn.length > 0 ? (
+                            <>
+                                Waiting for&nbsp;
+                                <PlayerNameList players={store.waitingOn.map(id => store.playersById[id])} />
+                            </>
+                        ) : 'Waiting for other players to confirm...'
                     ) : (
                         <Button onClick={confirm} big color={`cards.${store.ownCard}`}>OK</Button>
                     )}

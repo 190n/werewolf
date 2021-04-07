@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import { Button, ButtonGroup, Tag, ToggleButton, ToggleButtonCapitalized } from '../ui';
 import { TurnComponent } from '../Turn';
 
-const Seer: TurnComponent = observer(({ store: { playersInGame, revelations, ownActions, ownId }, onAction }) => {
+const Seer: TurnComponent = observer(({ store: { playersInGame, revelations, ownActions, ownId, nicks }, onAction }) => {
     const [choice1, setChoice1] = useState(''),
         [choice2, setChoice2] = useState('');
 
@@ -98,7 +98,7 @@ const Seer: TurnComponent = observer(({ store: { playersInGame, revelations, own
         } else {
             message = (
                 <p>
-                    <strong>{playersInGame.find(p => p.id == ownActions[0])?.nick}</strong>
+                    <strong>{nicks[ownActions[0]]}</strong>
                     's card was the <Tag card={revelations[0]} />.
                 </p>
             );
