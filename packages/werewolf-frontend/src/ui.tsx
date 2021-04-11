@@ -392,7 +392,7 @@ export const Tag = ({ card, children }: Omit<TagProps, 'doppelganger'>) => {
     if (card.startsWith('d_')) {
         return <TagBase card={card.substr(2)} doppelganger>D| {children ?? card.substr(2)}</TagBase>;
     } else {
-        return <TagBase card={card}>{children ?? card}</TagBase>;
+        return <TagBase card={card}>{children ?? card.replace('doppelganger', 'doppelgänger')}</TagBase>;
     }
 };
 
