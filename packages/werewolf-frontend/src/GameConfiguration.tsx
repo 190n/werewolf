@@ -8,9 +8,8 @@ import useSharedSocket from './use-shared-socket';
 
 const cards = [
     'werewolf',
-    'werewolf',
+    'doppelganger',
     'minion',
-    'mason',
     'mason',
     'seer',
     'robber',
@@ -20,17 +19,16 @@ const cards = [
     'tanner',
     'hunter',
     'villager',
-    'villager',
-    'villager',
 ];
 
 const selectables: { [key: string]: string[] } = {
-    ...Object.fromEntries(cards.filter(c => c != 'werewolf' && c != 'mason' && c != 'villager').map(c => [c, [c]])),
+    ...Object.fromEntries(cards.filter(c => !(['werewolf', 'doppelganger', 'mason', 'villager'].includes(c))).map(c => [c, [c]])),
     werewolves: ['werewolf', 'werewolf'],
     masons: ['mason', 'mason'],
     'villager 1': ['villager'],
     'villager 2': ['villager'],
     'villager 3': ['villager'],
+    doppelgänger: ['doppelganger'],
 };
 
 const sortedKeys = Object.keys(selectables).sort((a, b) => cards.indexOf(selectables[a][0]) - cards.indexOf(selectables[b][0]));
