@@ -213,7 +213,13 @@ export function performAction(
 }
 
 export const dependencies: { [card: string]: string[] | undefined } = {
-    insomniac: ['robber', 'troublemaker'],
+    werewolf: ['doppelganger'],
+    minion: ['doppelganger'],
+    mason: ['doppelganger'],
+    seer: ['doppelganger'],
+    robber: ['doppelganger'],
+    drunk: ['doppelganger'],
+    insomniac: ['robber', 'troublemaker', 'doppelganger'],
 };
 
 export function canTakeAction(
