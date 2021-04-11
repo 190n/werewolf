@@ -105,7 +105,14 @@ export function isActionLegal(
 ): boolean {
     const theirCard = assignedCards[playerId];
 
-    if (theirCard == 'werewolf') {
+    if (theirCard == 'doppelganger') {
+        // must be the id of a different player, or confirming what they saw
+        if (previousActions.length == 0) {
+            return action != playerId && assignedCards.hasOwnProperty(action);
+        } else {
+            return action == '';
+        }
+    } else if (theirCard == 'werewolf') {
         if (previousActions.length == 0 && Object.keys(assignedCards).filter(id => assignedCards[id] == 'werewolf').length == 1) {
             // they are the only werewolf, so they can choose a card in the middle, or confirm what they saw
             return action.length == 1 && '012'.includes(action) || action == '';
