@@ -245,6 +245,36 @@ export function canTakeAction(
     }
 }
 
+// An action group is a group of zero or more players that can take their actions at the same time.
+// The action groups are processed in order. Once all players from one group have taken their
+// actions AND a certain amount of time has passed, the next group takes actions.
+
+// An empty array (group of zero players) means the next players must wait no matter what. This is
+// to avoid revealing that certain cards were not given to anyone. Consider a game with the
+// following cards selected: werewolf, werewolf, seer, robber, troublemaker, insomniac, tanner. If
+// the robber and troublemaker end up in the center, the insomniac could theoretically take their
+// turn immediately as no one could have switched their card. But this would reveal that the robber
+// and troublemaker cards are in the center.
+
+// BUT TROUBLEMAKER COULD GO AFTER DOPPELGANGER
+// NEED TO INDICATE WHICH PLAYERS ARE REQUIRED FOR THE TURNS TO CONTINUE
+
+export interface ActionGroup {
+    allowed: string[];  // players that can take their action starting now
+    required: string[]; // players that must take their action before the next group (maybe not subset of allowed)
+}
+
+export function makeActionGroups(assignedCards: CardAssignments, center: Center): ActionGroup[] {
+    const cardsSelected = Object.values(assignedCards).concat(center),
+        groups: ActionGroup[] = [];
+
+    if (cardsSelected.includes('doppelganger')) {
+        
+    }
+
+    return groups;
+}
+
 export function isTurnImmediatelyComplete(card: string): boolean {
     if (card == 'tanner' || card == 'hunter' || card == 'villager') {
         return true;
