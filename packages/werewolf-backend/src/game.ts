@@ -266,10 +266,12 @@ export interface ActionGroup {
 
 export function makeActionGroups(assignedCards: CardAssignments, center: Center): ActionGroup[] {
     const cardsSelected = Object.values(assignedCards).concat(center),
+        players = Object.keys(assignedCards),
         groups: ActionGroup[] = [];
 
     if (cardsSelected.includes('doppelganger')) {
-        
+        const doppelganger = players.find(p => assignedCards[p] == 'doppelganger')!;
+        groups.push({ allowed: [doppelganger], required: [doppelganger] });
     }
 
     return groups;

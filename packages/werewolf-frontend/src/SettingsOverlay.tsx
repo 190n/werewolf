@@ -3,10 +3,11 @@ import styled from 'styled-components';
 import { MdVolumeOff, MdVolumeUp, MdOpenInNew, MdBrightness3, MdBrightness7 } from 'react-icons/md';
 
 import { ExternalLink, IconButton } from './ui';
-import opusFile from './music/fantasy-ukulele.opus';
-import cafFile from './music/fantasy-ukulele.caf';
-import m4aFile from './music/fantasy-ukulele.m4a';
 import { useColorMode, ColorMode, ColorModePreference } from './color-mode';
+
+const opusFile = new URL('music/fantasy-ukulele.opus', import.meta.url);
+const cafFile = new URL('music/fantasy-ukulele.caf', import.meta.url);
+const m4aFile = new URL('music/fantasy-ukulele.m4a', import.meta.url);
 
 const FloatingContainerLeft = styled.div`
     position: fixed;

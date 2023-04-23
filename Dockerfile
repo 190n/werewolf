@@ -3,9 +3,16 @@ WORKDIR /app
 COPY . .
 WORKDIR /app/packages/werewolf-frontend
 RUN yarn
-RUN yarn global add parcel-bundler
-RUN rm -fr dist .env .env.production
+RUN rm -fr dist .env .env.production .parcel-cache
 ENV NODE_ENV=production
+
+ARG backendBaseUrl=''
+ARG frontendBaseUrl=''
+ARG backendBaseSocketUrl='ws://localhost:5000'
+
+ENV BACKEND_BASE_URL=${backendBaseUrl}
+ENV FRONTEND_BASE_URL=${frontendBaseUrl}
+ENV BACKEND_BASE_SOCKET_URL=${backendBaseSocketUrl}
 RUN yarn build
 WORKDIR /app/packages/werewolf-backend
 RUN rm -fr dist
